@@ -97,6 +97,63 @@ python run.py
 
 ---
 
+# GitHub Workflow
+
+## Branch Strategy
+
+The project follows a feature branch workflow.
+
+```
+main
+│
+├── feature/github-workflow-setup
+├── feature/dashboard-ui
+├── feature/database-models
+```
+
+Only reviewed code is merged into the main branch.
+
+---
+
+## Commit Convention
+
+We use Conventional Commits.
+
+Examples
+
+```
+feat: add dashboard page
+fix: correct database query
+docs: update project documentation
+refactor: improve application structure
+chore: update project dependencies
+```
+
+---
+
+## Pull Request Process
+
+Every feature is developed in its own branch.
+
+Each Pull Request includes:
+
+- Summary
+- Related GitHub Issue
+- Testing information
+
+---
+
+## Issue Tracking
+
+All development tasks are tracked using GitHub Issues.
+
+Each issue contains:
+
+- Title
+- Description
+- Label
+- Assignee
+
 ## Team
 
 SW2627 Project
