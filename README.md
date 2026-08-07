@@ -2,29 +2,29 @@
 
 ## Project Overview
 
-The Delivery Pattern Analytics Platform is a Python-based analytics dashboard developed to help food delivery operations teams identify delivery patterns that lead to SLA (Service Level Agreement) violations during peak hours.
+The Delivery Pattern Analytics Platform is a Python-based analytics solution designed to help food delivery companies identify delivery patterns that contribute to SLA (Service Level Agreement) violations during peak hours.
 
-The platform centralizes delivery logs, rider assignments, customer complaints, and refund records into a single dashboard, enabling data-driven operational decisions.
+This project demonstrates a production-style Python workflow by separating data ingestion, data processing, and output generation into a modular script. It follows best practices for reproducibility, maintainability, and automation.
 
 ---
 
-## Tech Stack
+# Tech Stack
 
-- Python
+- Python 3.13
+- Pandas
 - Flask
-- SQLite
-- HTML5
-- CSS3
-- Bootstrap 5
-- Chart.js
+- Flask SQLAlchemy
+- Flask Login
+- Flask Migrate
 
 ---
 
-## Project Structure
+# Project Structure
 
 ```
 SW2627-Python-DeliveryPatternAnalytics/
 
+│
 ├── app/
 │   ├── database/
 │   ├── models/
@@ -36,23 +36,37 @@ SW2627-Python-DeliveryPatternAnalytics/
 │   ├── templates/
 │   └── utils/
 │
-├── run.py
+├── data/
+│   ├── raw/
+│   │   └── deliveries.csv
+│   └── processed/
+│
+├── logs/
+│   └── workflow.log
+│
+├── output/
+│   └── processed_deliveries.csv
+│
+├── scripts/
+│   └── delivery_workflow.py
+│
 ├── requirements.txt
 ├── README.md
-└── .gitignore
+├── WORKFLOW.md
+└── run.py
 ```
 
 ---
 
-## Setup Instructions
+# Setup Instructions
 
 ### Clone Repository
 
 ```bash
-git clone https://github.com/<your-username>/SW2627-Python-DeliveryPatternAnalytics.git
+git clone https://github.com/<your-github-username>/SW2627-Python-DeliveryPatternAnalytics.git
 ```
 
-### Navigate into Project
+### Navigate to Project
 
 ```bash
 cd SW2627-Python-DeliveryPatternAnalytics
@@ -64,12 +78,18 @@ cd SW2627-Python-DeliveryPatternAnalytics
 python -m venv venv
 ```
 
-### Activate Environment
+### Activate Virtual Environment
 
 Git Bash
 
 ```bash
 source venv/Scripts/activate
+```
+
+Windows Command Prompt
+
+```cmd
+venv\Scripts\activate
 ```
 
 ### Install Dependencies
@@ -78,82 +98,123 @@ source venv/Scripts/activate
 pip install -r requirements.txt
 ```
 
-### Run Application
+---
+
+# Python Workflow
+
+This project follows a simple production workflow consisting of three stages:
+
+### 1. Ingest Data
+
+The workflow reads delivery records from:
+
+```
+data/raw/deliveries.csv
+```
+
+The `ingest_data()` function is responsible only for loading the data into a Pandas DataFrame.
+
+---
+
+### 2. Process Data
+
+The `process_data()` function performs the business logic by:
+
+- Removing duplicate records
+- Comparing delivery time with SLA limits
+- Creating an **SLA_Status** column
+- Identifying whether a delivery is **On Time** or **Violated**
+
+---
+
+### 3. Output Results
+
+The `output_results()` function saves the processed data to:
+
+```
+output/processed_deliveries.csv
+```
+
+Execution details are automatically recorded in:
+
+```
+logs/workflow.log
+```
+
+---
+
+# Running the Workflow
+
+Execute the workflow using:
 
 ```bash
-python run.py
+python scripts/delivery_workflow.py
+```
+
+Successful execution displays:
+
+```
+Starting Delivery Workflow...
+
+Processed file saved at:
+output/processed_deliveries.csv
+
+Workflow Completed Successfully.
 ```
 
 ---
 
-## Features
+# Output Files
 
-- Delivery Dashboard
-- Rider Performance
-- SLA Analysis
-- Complaint Analysis
-- Refund Analysis
-- Reports
+After execution, the workflow generates:
+
+### Processed Dataset
+
+```
+output/processed_deliveries.csv
+```
+
+This file contains all delivery records along with the generated **SLA_Status** column.
+
+### Log File
+
+```
+logs/workflow.log
+```
+
+The log file records workflow execution details, including:
+
+- Workflow started
+- Data loaded
+- Data processed
+- Output generated
+- Workflow completed
 
 ---
 
-# GitHub Workflow
+# Features
 
-## Branch Strategy
-
-The project follows a feature branch workflow.
-
-```
-main
-│
-├── feature/github-workflow-setup
-├── feature/dashboard-ui
-├── feature/database-models
-```
-
-Only reviewed code is merged into the main branch.
+- Production-style Python script
+- Modular workflow using three-function pattern
+- CSV data ingestion
+- SLA violation detection
+- Processed CSV generation
+- Logging support
+- Well-documented functions with docstrings
 
 ---
 
-## Commit Convention
+# Team Workflow
 
-We use Conventional Commits.
+The repository follows a feature-branch workflow.
 
-Examples
-
-```
-feat: add dashboard page
-fix: correct database query
-docs: update project documentation
-refactor: improve application structure
-chore: update project dependencies
-```
+- Main branch contains stable code.
+- New work is developed in feature branches.
+- Pull Requests are created before merging.
+- Conventional Commit messages are used.
 
 ---
 
-## Pull Request Process
+# Author
 
-Every feature is developed in its own branch.
-
-Each Pull Request includes:
-
-- Summary
-- Related GitHub Issue
-- Testing information
-
----
-
-## Issue Tracking
-
-All development tasks are tracked using GitHub Issues.
-
-Each issue contains:
-
-- Title
-- Description
-- Label
-- Assignee
-
-## Team
-
-SW2627 Project
+SW2627 – Delivery Pattern Analytics Platform
