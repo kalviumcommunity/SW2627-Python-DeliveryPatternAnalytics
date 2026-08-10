@@ -1,0 +1,47 @@
+[
+  {
+    "delivery_id": 201,
+    "customer": {
+      "name": "Alice",
+      "city": "Delhi"
+    },
+    "rider": {
+      "id": "R010",
+      "name": "Rahul"
+    },
+    "delivery_time": 29,
+    "sla_limit": 30,
+    "complaint": false,
+    "refund": 0
+  },
+  {
+    "delivery_id": 202,
+    "customer": {
+      "name": "Bob",
+      "city": "Mumbai"
+    },
+    "rider": {
+      "id": "R011",
+      "name": "Amit"
+    },
+    "delivery_time": 42,
+    "sla_limit": 30,
+    "complaint": true,
+    "refund": 120
+  },
+  {
+    "delivery_id": 203,
+    "customer": {
+      "name": "Charlie",
+      "city": "Bangalore"
+    },
+    "rider": {
+      "id": "R012",
+      "name": "Vikram"
+    },
+    "delivery_time": 27,
+    "sla_limit": 30,
+    "complaint": false,
+    "refund": 0
+  }
+]
