@@ -1,0 +1,78 @@
+{
+    "timestamp": "2026-08-13T12:09:37.142958",
+    "source": "data/raw/delivery_profiling_dataset.xlsx",
+    "strategy_summary": {
+        "numerical": "median",
+        "categorical": "mode",
+        "time_series": "forward_fill_not_required",
+        "critical_identifiers": "drop_rows_if_missing"
+    },
+    "before_imputation": {
+        "delivery_time_min": {
+            "null_count": 2,
+            "null_percentage": 6.67
+        },
+        "delivery_status": {
+            "null_count": 1,
+            "null_percentage": 3.33
+        },
+        "complaint": {
+            "null_count": 1,
+            "null_percentage": 3.33
+        }
+    },
+    "imputation_decisions": [
+        {
+            "column": "delivery_time_min",
+            "strategy": "median",
+            "before_nulls": 2,
+            "after_nulls": 0,
+            "values_imputed": 2,
+            "imputation_value": 32.5,
+            "reason": "Median was selected for the numerical delivery metric because it is resistant to extreme values."
+        },
+        {
+            "column": "delivery_status",
+            "strategy": "mode",
+            "before_nulls": 1,
+            "after_nulls": 0,
+            "values_imputed": 1,
+            "imputation_value": "Delayed",
+            "reason": "Mode was selected for the categorical column because it preserves the most common category."
+        },
+        {
+            "column": "complaint",
+            "strategy": "mode",
+            "before_nulls": 1,
+            "after_nulls": 0,
+            "values_imputed": 1,
+            "imputation_value": "No",
+            "reason": "Mode was selected for the categorical column because it preserves the most common category."
+        }
+    ],
+    "critical_identifier_decisions": [
+        {
+            "column": "delivery_id",
+            "strategy": "no_action",
+            "before_nulls": 0,
+            "after_nulls": 0,
+            "rows_dropped": 0,
+            "reason": "No missing critical identifiers were found."
+        },
+        {
+            "column": "rider_id",
+            "strategy": "no_action",
+            "before_nulls": 0,
+            "after_nulls": 0,
+            "rows_dropped": 0,
+            "reason": "No missing critical identifiers were found."
+        }
+    ],
+    "after_imputation": {},
+    "impact": {
+        "original_rows": 30,
+        "final_rows": 30,
+        "rows_removed": 0
+    },
+    "all_missing_values_handled": true
+}

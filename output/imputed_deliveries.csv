@@ -1,0 +1,31 @@
+delivery_id,customer_name,rider_id,city,delivery_time_min,sla_limit_min,delivery_status,complaint,refund_amount,delivery_date,payment_method
+1001,Aarav Sharma,R001,Delhi,28.0,30,On Time,No,0,2026-07-01,UPI
+1002,Priya Singh,R002,Mumbai,42.0,30,Delayed,Yes,120,2026-07-01,Card
+1003,Rahul Verma,R003,Bangalore,25.0,30,On Time,No,0,2026-07-02,Cash
+1004,Neha Gupta,R004,Delhi,55.0,30,Delayed,Yes,200,2026-07-02,UPI
+1005,Aarav Sharma,R005,Delhi,31.0,30,Delayed,No,0,2026-07-03,UPI
+1006,Riya Patel,R006,Pune,22.0,30,On Time,No,0,2026-07-03,Card
+1007,Mohit Kumar,R007,Mumbai,48.0,30,Delayed,Yes,150,2026-07-04,Cash
+1007,Mohit Kumar,R007,Mumbai,48.0,30,Delayed,Yes,150,2026-07-04,Cash
+1009,Sneha Iyer,R008,Chennai,27.0,30,On Time,No,0,2026-07-05,UPI
+1010,Vikram Rao,R009,Hyderabad,35.0,30,Delayed,No,0,2026-07-05,Card
+1011,Ananya Mehta,R010,Delhi,32.5,30,Delayed,No,0,2026-07-06,UPI
+1012,Karan Joshi,R011,Pune,29.0,30,On Time,No,0,2026-07-06,Cash
+1013,Rohit Das,R012,Mumbai,-15.0,30,On Time,No,0,2026-07-07,Card
+1014,Meera Shah,R013,Delhi,33.0,30,Delayed,Yes,-50,2026-07-07,UPI
+1015,Arjun Nair,R014,Bangalore,24.0,30,On Time,No,0,2026-07-08,UPI
+1016,Priya Singh,R015,Mumbai,44.0,30,Delayed,Yes,100,2026-07-08,Card
+1017,Sneha Iyer,R016,Chennai,32.5,30,Delayed,Yes,80,2026-07-09,UPI
+1018,Vikram Rao,R017,Hyderabad,38.0,30,Delayed,No,0,2026-07-09,Cash
+1019,Aarav Sharma,R018,Delhi,26.0,30,On Time,No,0,2026-07-10,UPI
+1020,Ananya Mehta,R019,Delhi,41.0,30,Delayed,Yes,90,2026-07-10,Card
+1021,Rahul Verma,R020,Bangalore,29.0,30,On Time,No,0,2026-07-11,Cash
+1022,Neha Gupta,R021,Delhi,60.0,30,Delayed,Yes,250,2026-07-11,UPI
+1023,Riya Patel,R022,Pune,23.0,30,On Time,No,0,2026-07-12,Card
+1024,Karan Joshi,R023,Pune,34.0,30,Delayed,No,0,2026-07-12,Cash
+1025,Rohit Das,R024,Mumbai,39.0,30,Delayed,Yes,110,2026-07-13,UPI
+1026,Priya  Singh,R025,Mumbai,32.0,30,Delayed,No,0,2026-07-13,Card
+1027,PRIYA SINGH,R026,Mumbai,30.0,30,On Time,No,0,2026-07-14,UPI
+1028,Meera Shah,R027,Delhi,45.0,30,Delayed,Yes,140,2026-07-14,Card
+1029,Arjun Nair,R028,Bangalore,21.0,30,On Time,No,0,2026-07-15,UPI
+1030,Sneha Iyer,R029,Chennai,52.0,30,Delayed,Yes,180,2026-07-15,Cash
