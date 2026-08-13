@@ -1,0 +1,91 @@
+{
+    "timestamp": "2026-08-13T09:42:05.712031",
+    "source": "data/raw/delivery_profiling_dataset.xlsx",
+    "conversions": [
+        {
+            "column": "delivery_date",
+            "before": "str",
+            "after": "datetime64[us]",
+            "format": "%Y-%m-%d",
+            "conversion_errors": []
+        },
+        {
+            "column": "refund_amount",
+            "before": "int64",
+            "after": "float64",
+            "conversion_errors": []
+        },
+        {
+            "column": "complaint",
+            "before": "str",
+            "after": "boolean",
+            "mapping": {
+                "yes": true,
+                "no": false,
+                "1": true,
+                "0": false,
+                "true": true,
+                "false": false
+            },
+            "conversion_errors": []
+        }
+    ],
+    "dtype_changes": {
+        "complaint": {
+            "before": "str",
+            "after": "boolean"
+        },
+        "refund_amount": {
+            "before": "int64",
+            "after": "float64"
+        },
+        "delivery_date": {
+            "before": "str",
+            "after": "datetime64[us]"
+        }
+    },
+    "validation": {
+        "delivery_date": {
+            "expected": "datetime64[ns]",
+            "actual": "datetime64[us]",
+            "valid": true
+        },
+        "refund_amount": {
+            "expected": "float64",
+            "actual": "float64",
+            "valid": true
+        },
+        "complaint": {
+            "expected": "boolean",
+            "actual": "boolean",
+            "valid": true
+        }
+    },
+    "all_required_types_valid": true,
+    "before_dtypes": {
+        "delivery_id": "int64",
+        "customer_name": "str",
+        "rider_id": "str",
+        "city": "str",
+        "delivery_time_min": "float64",
+        "sla_limit_min": "int64",
+        "delivery_status": "str",
+        "complaint": "str",
+        "refund_amount": "int64",
+        "delivery_date": "str",
+        "payment_method": "str"
+    },
+    "after_dtypes": {
+        "delivery_id": "int64",
+        "customer_name": "str",
+        "rider_id": "str",
+        "city": "str",
+        "delivery_time_min": "float64",
+        "sla_limit_min": "int64",
+        "delivery_status": "str",
+        "complaint": "boolean",
+        "refund_amount": "float64",
+        "delivery_date": "datetime64[us]",
+        "payment_method": "str"
+    }
+}
