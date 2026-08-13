@@ -1,91 +1,246 @@
-# Missing Value Detection & Imputation
+# Data Type Enforcement & Standardisation
 
 ## Overview
 
-This assignment implements the **Missing Value Detection & Imputation** stage of the Delivery Pattern Analytics Platform.
+This assignment implements **Data Type Enforcement & Standardisation (2.19)** for the Delivery Pattern Analytics Platform.
 
-Real-world delivery datasets can contain incomplete records. Missing delivery times, delivery statuses, or complaint information can affect calculations and downstream analysis.
+The purpose is to ensure that important columns use correct and consistent data types before analysis.
 
-The purpose of this module is to:
+The module handles:
 
-- Detect missing values before treatment.
-- Select an appropriate strategy based on column type and business context.
-- Impute numerical values using the median.
-- Impute categorical values using the mode.
-- Protect critical identifier fields from artificial values.
-- Compare missing values before and after treatment.
-- Record every imputation decision.
-- Save an audit report explaining the impact of the treatment.
-- Save an imputed dataset for downstream processing.
+- String to datetime conversion
+- Currency to float conversion
+- Text/integer to Boolean conversion
+- Before/after dtype comparison
+- Conversion validation
+- Conversion error logging
 
-The module does **not blindly fill every missing value**. Each treatment is selected intentionally and documented for auditability.
-
----
-
-## Assignment
-
-**2.18 — Missing Value Detection & Imputation**
-
-The assignment focuses on handling incomplete records using defensible and auditable strategies.
-
-The main principle is:
-
-> Missing values should be handled intentionally based on data type and business context, rather than being filled or deleted without documentation.
-
----
-
-## Objectives
-
-The module is designed to:
-
-1. Analyze missing values before treatment.
-2. Calculate null counts and percentages.
-3. Use median imputation for numerical columns.
-4. Use mode imputation for categorical columns.
-5. Avoid inventing values for critical identifiers.
-6. Drop rows only when a critical identifier is missing.
-7. Analyze missing values after treatment.
-8. Compare before and after results.
-9. Record the reasoning behind every decision.
-10. Save the final imputed dataset.
-11. Save an auditable JSON report.
-
----
-
-# Technologies Used
+## Technologies
 
 - Python 3.13
 - Pandas
 - OpenPyXL
 - JSON
 
----
-
-# Project Structure
-
-The relevant project files are:
+## Input Dataset
 
 ```text
-SW2627-Python-DeliveryPatternAnalytics/
-│
-├── data/
-│   └── raw/
-│       └── delivery_profiling_dataset.xlsx
-│
-├── scripts/
-│   ├── delivery_workflow.py
-│   ├── data_ingestion.py
-│   ├── data_profiling.py
-│   ├── type_enforcement.py
-│   └── missing_value_imputation.py
-│
-├── output/
-│   ├── profiling_report.json
-│   ├── type_enforcement_report.json
-│   ├── type_enforced_deliveries.csv
-│   ├── imputed_deliveries.csv
-│   └── imputation_audit.json
-│
-├── requirements.txt
-├── README.md
-└── WORKFLOW.md
+data/raw/delivery_profiling_dataset.xlsx
+```
+
+The dataset contains delivery information such as:
+
+- delivery_id
+- customer_name
+- rider_id
+- city
+- delivery_time_min
+- sla_limit_min
+- delivery_status
+- complaint
+- refund_amount
+- delivery_date
+- payment_method
+
+The original Excel file is not modified.
+
+## Type Enforcement
+
+| Column | Conversion | Final Type |
+|---|---|---|
+| delivery_date | String → Datetime | datetime64[ns] |
+| refund_amount | Currency → Float | float64 |
+| complaint | Text/Integer → Boolean | boolean |
+
+### Date Conversion
+
+The `delivery_date` column is converted using an explicit format:
+
+```python
+pd.to_datetime(
+    value,
+    format="%Y-%m-%d"
+)
+```
+
+Using an explicit format prevents incorrect date interpretation.
+
+### Currency Conversion
+
+The `refund_amount` column is cleaned before conversion.
+
+Currency symbols and commas are removed:
+
+```text
+$1,250.00 → 1250.00
+```
+
+The final type is:
+
+```text
+float64
+```
+
+Invalid values are recorded as conversion errors.
+
+### Boolean Conversion
+
+The `complaint` column supports:
+
+```text
+Yes → True
+No  → False
+1   → True
+0   → False
+```
+
+The final Pandas type is:
+
+```text
+boolean
+```
+
+## Validation
+
+The script captures data types before conversion and after conversion.
+
+It validates that:
+
+- delivery_date → datetime64[ns]
+- refund_amount → float64
+- complaint → boolean
+
+Each conversion is reported as PASS or FAIL.
+
+## Script
+
+The implementation is located at:
+
+```text
+scripts/type_enforcement.py
+```
+
+## Workflow
+
+```text
+Load Dataset
+     ↓
+Capture Original Types
+     ↓
+Convert Date
+     ↓
+Convert Currency
+     ↓
+Convert Boolean
+     ↓
+Capture Final Types
+     ↓
+Compare Types
+     ↓
+Validate Conversions
+     ↓
+Generate Report
+     ↓
+Save Processed Dataset
+```
+
+## Output Files
+
+The script generates:
+
+```text
+output/type_enforced_deliveries.csv
+```
+
+This contains the dataset after type conversion.
+
+It also generates:
+
+```text
+output/type_enforcement_report.json
+```
+
+The report records:
+
+- Original data types
+- Final data types
+- Type changes
+- Conversion methods
+- Conversion errors
+- Validation results
+
+## Running the Script
+
+Activate the virtual environment:
+
+```bash
+source venv/Scripts/activate
+```
+
+Check dependencies:
+
+```bash
+python -c "import pandas; import openpyxl; print('Dependencies OK')"
+```
+
+Run the script:
+
+```bash
+python scripts/type_enforcement.py
+```
+
+## Expected Result
+
+A successful execution should show:
+
+```text
+delivery_date: PASS
+refund_amount: PASS
+complaint: PASS
+```
+
+The terminal will also display the locations of the generated output files.
+
+## Data Preservation
+
+The original dataset remains unchanged:
+
+```text
+data/raw/delivery_profiling_dataset.xlsx
+```
+
+Only the processed copy is saved to:
+
+```text
+output/type_enforced_deliveries.csv
+```
+
+This keeps the original source data available for auditing and reproducibility.
+
+## Relationship With Previous Assignments
+
+The project workflow now follows:
+
+```text
+Validation
+    ↓
+Ingestion
+    ↓
+Profiling
+    ↓
+Missing Value Handling
+    ↓
+Type Enforcement
+```
+
+The previous assignments identified and handled data-quality problems.
+
+This assignment ensures that the cleaned data uses reliable and predictable data types.
+
+## Assignment Outcome
+
+The completed module provides a reusable type-enforcement stage.
+
+It explicitly converts dates, currency, and Boolean fields, validates the resulting types, records conversion information, and saves both the processed dataset and an audit report.
+
+The resulting dataset is ready for reliable calculations, filtering, aggregation, time-based analysis, and future analytics.
