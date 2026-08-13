@@ -1,67 +1,10 @@
 {
-    "timestamp": "2026-08-13T09:42:05.712031",
+    "timestamp": "2026-08-13T12:33:47.002559",
     "source": "data/raw/delivery_profiling_dataset.xlsx",
-    "conversions": [
-        {
-            "column": "delivery_date",
-            "before": "str",
-            "after": "datetime64[us]",
-            "format": "%Y-%m-%d",
-            "conversion_errors": []
-        },
-        {
-            "column": "refund_amount",
-            "before": "int64",
-            "after": "float64",
-            "conversion_errors": []
-        },
-        {
-            "column": "complaint",
-            "before": "str",
-            "after": "boolean",
-            "mapping": {
-                "yes": true,
-                "no": false,
-                "1": true,
-                "0": false,
-                "true": true,
-                "false": false
-            },
-            "conversion_errors": []
-        }
-    ],
-    "dtype_changes": {
-        "complaint": {
-            "before": "str",
-            "after": "boolean"
-        },
-        "refund_amount": {
-            "before": "int64",
-            "after": "float64"
-        },
-        "delivery_date": {
-            "before": "str",
-            "after": "datetime64[us]"
-        }
+    "summary": {
+        "all_required_types_valid": true,
+        "columns_changed": 3
     },
-    "validation": {
-        "delivery_date": {
-            "expected": "datetime64[ns]",
-            "actual": "datetime64[us]",
-            "valid": true
-        },
-        "refund_amount": {
-            "expected": "float64",
-            "actual": "float64",
-            "valid": true
-        },
-        "complaint": {
-            "expected": "boolean",
-            "actual": "boolean",
-            "valid": true
-        }
-    },
-    "all_required_types_valid": true,
     "before_dtypes": {
         "delivery_id": "int64",
         "customer_name": "str",
@@ -87,5 +30,72 @@
         "refund_amount": "float64",
         "delivery_date": "datetime64[us]",
         "payment_method": "str"
+    },
+    "dtype_changes": {
+        "complaint": {
+            "before": "str",
+            "after": "boolean"
+        },
+        "refund_amount": {
+            "before": "int64",
+            "after": "float64"
+        },
+        "delivery_date": {
+            "before": "str",
+            "after": "datetime64[us]"
+        }
+    },
+    "conversion_logs": [
+        {
+            "column": "delivery_date",
+            "conversion": "string_to_datetime",
+            "before_type": "str",
+            "after_type": "datetime64[us]",
+            "format": "%Y-%m-%d",
+            "conversion_errors": []
+        },
+        {
+            "column": "refund_amount",
+            "conversion": "currency_to_float",
+            "before_type": "int64",
+            "after_type": "float64",
+            "currency_symbols_removed": [
+                "$",
+                ","
+            ],
+            "conversion_errors": []
+        },
+        {
+            "column": "complaint",
+            "conversion": "value_to_boolean",
+            "before_type": "str",
+            "after_type": "boolean",
+            "mapping": {
+                "yes": true,
+                "no": false,
+                "true": true,
+                "false": false,
+                "1": true,
+                "0": false
+            },
+            "conversion_errors": []
+        }
+    ],
+    "validation": {
+        "delivery_date": {
+            "expected_type": "datetime64[ns]",
+            "actual_type": "datetime64[us]",
+            "valid": true
+        },
+        "refund_amount": {
+            "expected_type": "float64",
+            "actual_type": "float64",
+            "valid": true
+        },
+        "complaint": {
+            "expected_type": "boolean",
+            "actual_type": "boolean",
+            "valid": true
+        }
     }
 }

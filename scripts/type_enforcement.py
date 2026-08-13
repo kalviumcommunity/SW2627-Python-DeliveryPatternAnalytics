@@ -1,29 +1,29 @@
 import json
 import os
+
 import pandas as pd
 
-# ==========================================
+
+# ============================================================
 # Configuration
-# ==========================================
+# ============================================================
 
 INPUT_FILE = "data/raw/delivery_profiling_dataset.xlsx"
-OUTPUT_FILE = "output/type_enforcement_report.json"
-PROCESSED_FILE = "output/type_enforced_deliveries.csv"
+
+OUTPUT_FILE = "output/type_enforced_deliveries.csv"
+
+REPORT_FILE = "output/type_enforcement_report.json"
 
 
-# ==========================================
+# ============================================================
 # Load Dataset
-# ==========================================
+# ============================================================
 
 def load_dataset(filepath):
     """
     Load the delivery dataset from Excel.
 
-    Args:
-        filepath (str): Path to the Excel dataset.
-
-    Returns:
-        pandas.DataFrame: Loaded dataset.
+    The original source file is never modified.
     """
 
     if not os.path.exists(filepath):
@@ -46,19 +46,13 @@ def load_dataset(filepath):
     return df
 
 
-# ==========================================
-# Capture Original Data Types
-# ==========================================
+# ============================================================
+# Capture Data Types
+# ============================================================
 
 def capture_dtypes(df):
     """
-    Capture the original data types of all columns.
-
-    Args:
-        df (pandas.DataFrame): Input dataset.
-
-    Returns:
-        dict: Column names and their original data types.
+    Capture the current data type of every column.
     """
 
     return {
@@ -67,24 +61,19 @@ def capture_dtypes(df):
     }
 
 
-# ==========================================
-# Enforce Date Type
-# ==========================================
+# ============================================================
+# String -> Datetime
+# ============================================================
 
 def enforce_date_type(df):
     """
-    Convert delivery_date to datetime.
+    Convert delivery_date to datetime using an explicit format.
 
-    The source Excel file contains dates in YYYY-MM-DD format.
-    An explicit format is used to avoid relying on automatic
-    date inference.
+    Expected format:
+        YYYY-MM-DD
 
-    Args:
-        df (pandas.DataFrame): Input dataset.
-
-    Returns:
-        pandas.DataFrame: Dataset with enforced date type.
-        dict: Conversion details.
+    Explicit format is used instead of allowing pandas
+    to infer the format.
     """
 
     column = "delivery_date"
@@ -107,50 +96,51 @@ def enforce_date_type(df):
             continue
 
         try:
+            converted_value = pd.to_datetime(
+                value,
+                format="%Y-%m-%d"
+            )
+
             converted_values.append(
-                pd.to_datetime(
-                    value,
-                    format="%Y-%m-%d"
-                )
+                converted_value
             )
 
         except (ValueError, TypeError):
-            conversion_errors.append(str(value))
-            converted_values.append(pd.NaT)
 
-    df[column] = converted_values
+            conversion_errors.append(
+                str(value)
+            )
+
+            converted_values.append(
+                pd.NaT
+            )
+
+    df[column] = pd.to_datetime(
+        converted_values
+    )
 
     after_type = str(df[column].dtype)
 
-    return df, {
+    return {
         "column": column,
-        "before": before_type,
-        "after": after_type,
+        "conversion": "string_to_datetime",
+        "before_type": before_type,
+        "after_type": after_type,
         "format": "%Y-%m-%d",
         "conversion_errors": conversion_errors
     }
 
 
-# ==========================================
-# Enforce Currency Type
-# ==========================================
+# ============================================================
+# Currency -> Float
+# ============================================================
 
 def enforce_currency_type(df):
     """
-    Convert refund_amount into a numeric float.
+    Convert refund_amount into float.
 
-    Currency symbols and commas are removed before conversion.
-
-    The delivery dataset currently contains numeric refund
-    values, but this function also supports values such as
-    '$150.50' or '$1,250.00'.
-
-    Args:
-        df (pandas.DataFrame): Input dataset.
-
-    Returns:
-        pandas.DataFrame: Dataset with enforced numeric refund.
-        dict: Conversion details.
+    Currency symbols and thousands separators are removed
+    before numeric conversion.
     """
 
     column = "refund_amount"
@@ -172,7 +162,7 @@ def enforce_currency_type(df):
         .str.strip()
     )
 
-    converted_values = pd.to_numeric(
+    numeric_values = pd.to_numeric(
         cleaned_values,
         errors="coerce"
     )
@@ -181,8 +171,9 @@ def enforce_currency_type(df):
 
     for original, converted in zip(
         original_values,
-        converted_values
+        numeric_values
     ):
+
         if (
             pd.notna(original)
             and pd.isna(converted)
@@ -191,38 +182,39 @@ def enforce_currency_type(df):
                 str(original)
             )
 
-    df[column] = converted_values.astype(float)
+    df[column] = numeric_values.astype(float)
 
     after_type = str(df[column].dtype)
 
-    return df, {
+    return {
         "column": column,
-        "before": before_type,
-        "after": after_type,
+        "conversion": "currency_to_float",
+        "before_type": before_type,
+        "after_type": after_type,
+        "currency_symbols_removed": [
+            "$",
+            ","
+        ],
         "conversion_errors": conversion_errors
     }
 
 
-# ==========================================
-# Enforce Boolean Type
-# ==========================================
+# ============================================================
+# Integer / Text -> Boolean
+# ============================================================
 
 def enforce_boolean_type(df):
     """
-    Convert complaint values into proper Boolean values.
+    Convert complaint values to proper Boolean values.
 
-    Supported values:
-        Yes -> True
-        No  -> False
+    Supported values include:
+
+        Yes / No
+        yes / no
+        True / False
+        1 / 0
 
     Missing values remain missing.
-
-    Args:
-        df (pandas.DataFrame): Input dataset.
-
-    Returns:
-        pandas.DataFrame: Dataset with Boolean complaint values.
-        dict: Conversion details.
     """
 
     column = "complaint"
@@ -237,10 +229,10 @@ def enforce_boolean_type(df):
     mapping = {
         "yes": True,
         "no": False,
-        "1": True,
-        "0": False,
         "true": True,
-        "false": False
+        "false": False,
+        "1": True,
+        "0": False
     }
 
     conversion_errors = []
@@ -250,18 +242,34 @@ def enforce_boolean_type(df):
     for value in df[column]:
 
         if pd.isna(value):
-            converted_values.append(pd.NA)
+
+            converted_values.append(
+                pd.NA
+            )
+
             continue
 
-        normalized_value = str(value).strip().lower()
+        normalized_value = (
+            str(value)
+            .strip()
+            .lower()
+        )
 
         if normalized_value in mapping:
+
             converted_values.append(
                 mapping[normalized_value]
             )
+
         else:
-            conversion_errors.append(str(value))
-            converted_values.append(pd.NA)
+
+            conversion_errors.append(
+                str(value)
+            )
+
+            converted_values.append(
+                pd.NA
+            )
 
     df[column] = pd.Series(
         converted_values,
@@ -271,80 +279,91 @@ def enforce_boolean_type(df):
 
     after_type = str(df[column].dtype)
 
-    return df, {
+    return {
         "column": column,
-        "before": before_type,
-        "after": after_type,
+        "conversion": "value_to_boolean",
+        "before_type": before_type,
+        "after_type": after_type,
         "mapping": mapping,
         "conversion_errors": conversion_errors
     }
 
 
-# ==========================================
-# Validate Data Types
-# ==========================================
+# ============================================================
+# Validate Types
+# ============================================================
 
 def validate_types(df):
     """
-    Validate that required columns have the expected types.
-
-    Returns:
-        dict: Validation results.
+    Validate that required columns have the expected
+    final data types.
     """
 
     results = {}
 
+    # --------------------------------------------
+    # Date
+    # --------------------------------------------
+
     results["delivery_date"] = {
-        "expected": "datetime64[ns]",
-        "actual": str(df["delivery_date"].dtype),
+        "expected_type": "datetime64[ns]",
+        "actual_type": str(
+            df["delivery_date"].dtype
+        ),
         "valid": pd.api.types.is_datetime64_any_dtype(
             df["delivery_date"]
         )
     }
 
+    # --------------------------------------------
+    # Currency
+    # --------------------------------------------
+
     results["refund_amount"] = {
-        "expected": "float64",
-        "actual": str(df["refund_amount"].dtype),
+        "expected_type": "float64",
+        "actual_type": str(
+            df["refund_amount"].dtype
+        ),
         "valid": pd.api.types.is_float_dtype(
             df["refund_amount"]
         )
     }
 
+    # --------------------------------------------
+    # Boolean
+    # --------------------------------------------
+
     results["complaint"] = {
-        "expected": "boolean",
-        "actual": str(df["complaint"].dtype),
-        "valid": str(df["complaint"].dtype) == "boolean"
+        "expected_type": "boolean",
+        "actual_type": str(
+            df["complaint"].dtype
+        ),
+        "valid": str(
+            df["complaint"].dtype
+        ) == "boolean"
     }
 
     return results
 
 
-# ==========================================
-# Compare Data Types
-# ==========================================
+# ============================================================
+# Compare Before and After Types
+# ============================================================
 
-def compare_dtypes(before, after):
+def compare_dtypes(before_dtypes, after_dtypes):
     """
-    Compare data types before and after enforcement.
-
-    Args:
-        before (dict): Original types.
-        after (dict): Final types.
-
-    Returns:
-        dict: Type changes.
+    Identify columns whose data types changed.
     """
 
     changes = {}
 
-    for column in after:
+    for column in after_dtypes:
 
-        before_type = before.get(
-            column,
-            "not present"
+        before_type = before_dtypes.get(
+            column
         )
 
-        after_type = after[column]
+        after_type = after_dtypes[column]
 
         if before_type != after_type:
 
@@ -356,50 +375,58 @@ def compare_dtypes(before, after):
     return changes
 
 
-# ==========================================
-# Generate Type Enforcement Report
-# ==========================================
+# ============================================================
+# Generate Report
+# ============================================================
 
 def generate_report(
     before_dtypes,
     after_dtypes,
-    conversion_results,
+    conversion_logs,
     validation_results,
     dtype_changes
 ):
     """
-    Create a structured type-enforcement report.
+    Generate the complete type-enforcement report.
     """
 
+    all_valid = all(
+        result["valid"]
+        for result in validation_results.values()
+    )
+
     return {
+
         "timestamp": pd.Timestamp.now().isoformat(),
 
         "source": INPUT_FILE,
 
-        "conversions": conversion_results,
-
-        "dtype_changes": dtype_changes,
-
-        "validation": validation_results,
-
-        "all_required_types_valid": all(
-            result["valid"]
-            for result in validation_results.values()
-        ),
+        "summary": {
+            "all_required_types_valid": all_valid,
+            "columns_changed": len(
+                dtype_changes
+            )
+        },
 
         "before_dtypes": before_dtypes,
 
-        "after_dtypes": after_dtypes
+        "after_dtypes": after_dtypes,
+
+        "dtype_changes": dtype_changes,
+
+        "conversion_logs": conversion_logs,
+
+        "validation": validation_results
     }
 
 
-# ==========================================
-# Save JSON Report
-# ==========================================
+# ============================================================
+# Save Report
+# ============================================================
 
 def save_report(report, filepath):
     """
-    Save the type enforcement report as JSON.
+    Save the report as JSON.
     """
 
     directory = os.path.dirname(filepath)
@@ -424,13 +451,13 @@ def save_report(report, filepath):
         )
 
 
-# ==========================================
+# ============================================================
 # Save Processed Dataset
-# ==========================================
+# ============================================================
 
 def save_processed_dataset(df, filepath):
     """
-    Save the type-enforced dataset as CSV.
+    Save the type-enforced dataset.
     """
 
     directory = os.path.dirname(filepath)
@@ -447,26 +474,30 @@ def save_processed_dataset(df, filepath):
     )
 
 
-# ==========================================
-# Print Summary
-# ==========================================
+# ============================================================
+# Print Report
+# ============================================================
 
-def print_summary(
+def print_report(
     before_dtypes,
     after_dtypes,
-    conversion_results,
+    conversion_logs,
     validation_results,
     dtype_changes
 ):
     """
-    Print a readable type enforcement summary.
+    Print a readable report to the terminal.
     """
 
-    print("\n" + "=" * 60)
-    print("TYPE ENFORCEMENT REPORT")
-    print("=" * 60)
+    print("\n" + "=" * 65)
+    print("DATA TYPE ENFORCEMENT REPORT")
+    print("=" * 65)
 
-    print("\nData Type Changes:")
+    # --------------------------------------------
+    # Data type changes
+    # --------------------------------------------
+
+    print("\nDATA TYPE CHANGES")
 
     if dtype_changes:
 
@@ -479,26 +510,58 @@ def print_summary(
             )
 
     else:
-        print("  No data type changes detected.")
-
-    print("\nConversions:")
-
-    for conversion in conversion_results:
 
         print(
-            f"  {conversion['column']}: "
-            f"{conversion['before']} -> "
-            f"{conversion['after']}"
+            "  No data type changes detected."
         )
 
-        if conversion["conversion_errors"]:
+    # --------------------------------------------
+    # Conversion logs
+    # --------------------------------------------
+
+    print("\nCONVERSIONS")
+
+    for log in conversion_logs:
+
+        print(
+            f"  Column: {log['column']}"
+        )
+
+        print(
+            f"  Conversion: "
+            f"{log['conversion']}"
+        )
+
+        print(
+            f"  Before: "
+            f"{log['before_type']}"
+        )
+
+        print(
+            f"  After: "
+            f"{log['after_type']}"
+        )
+
+        if log["conversion_errors"]:
 
             print(
-                "    Conversion errors: "
-                f"{conversion['conversion_errors']}"
+                "  Conversion errors: "
+                f"{log['conversion_errors']}"
             )
 
-    print("\nValidation:")
+        else:
+
+            print(
+                "  Conversion errors: None"
+            )
+
+        print()
+
+    # --------------------------------------------
+    # Validation
+    # --------------------------------------------
+
+    print("TYPE VALIDATION")
 
     for column, result in validation_results.items():
 
@@ -509,12 +572,24 @@ def print_summary(
         )
 
         print(
-            f"  {column}: {status} "
-            f"(expected={result['expected']}, "
-            f"actual={result['actual']})"
+            f"  {column}: {status}"
         )
 
-    print("\nOriginal Data Types:")
+        print(
+            f"    Expected: "
+            f"{result['expected_type']}"
+        )
+
+        print(
+            f"    Actual: "
+            f"{result['actual_type']}"
+        )
+
+    # --------------------------------------------
+    # Original types
+    # --------------------------------------------
+
+    print("\nORIGINAL DATA TYPES")
 
     for column, dtype in before_dtypes.items():
 
@@ -522,7 +597,11 @@ def print_summary(
             f"  {column}: {dtype}"
         )
 
-    print("\nFinal Data Types:")
+    # --------------------------------------------
+    # Final types
+    # --------------------------------------------
+
+    print("\nFINAL DATA TYPES")
 
     for column, dtype in after_dtypes.items():
 
@@ -530,161 +609,155 @@ def print_summary(
             f"  {column}: {dtype}"
         )
 
-    print("=" * 60)
+    print("=" * 65)
 
 
-# ==========================================
-# Main
-# ==========================================
+# ============================================================
+# Main Workflow
+# ============================================================
 
 def main():
-    """
-    Execute the complete type enforcement workflow.
-    """
 
     print(
-        "\nStarting Type Enforcement..."
+        "\nStarting Data Type Enforcement "
+        "& Standardisation..."
     )
 
-    # --------------------------------------
+    # --------------------------------------------
     # Load dataset
-    # --------------------------------------
+    # --------------------------------------------
 
     df = load_dataset(
         INPUT_FILE
     )
 
-    # --------------------------------------
+    # --------------------------------------------
     # Capture original types
-    # --------------------------------------
+    # --------------------------------------------
 
     before_dtypes = capture_dtypes(
         df
     )
 
-    conversion_results = []
+    conversion_logs = []
 
-    # --------------------------------------
+    # --------------------------------------------
     # Date conversion
-    # --------------------------------------
+    # --------------------------------------------
 
-    df, date_result = enforce_date_type(
+    date_log = enforce_date_type(
         df
     )
 
-    conversion_results.append(
-        date_result
+    conversion_logs.append(
+        date_log
     )
 
-    # --------------------------------------
+    # --------------------------------------------
     # Currency conversion
-    # --------------------------------------
+    # --------------------------------------------
 
-    df, currency_result = enforce_currency_type(
+    currency_log = enforce_currency_type(
         df
     )
 
-    conversion_results.append(
-        currency_result
+    conversion_logs.append(
+        currency_log
     )
 
-    # --------------------------------------
+    # --------------------------------------------
     # Boolean conversion
-    # --------------------------------------
+    # --------------------------------------------
 
-    df, boolean_result = enforce_boolean_type(
+    boolean_log = enforce_boolean_type(
         df
     )
 
-    conversion_results.append(
-        boolean_result
+    conversion_logs.append(
+        boolean_log
     )
 
-    # --------------------------------------
+    # --------------------------------------------
     # Capture final types
-    # --------------------------------------
+    # --------------------------------------------
 
     after_dtypes = capture_dtypes(
         df
     )
 
-    # --------------------------------------
-    # Compare types
-    # --------------------------------------
+    # --------------------------------------------
+    # Compare data types
+    # --------------------------------------------
 
     dtype_changes = compare_dtypes(
         before_dtypes,
         after_dtypes
     )
 
-    # --------------------------------------
+    # --------------------------------------------
     # Validate conversions
-    # --------------------------------------
+    # --------------------------------------------
 
     validation_results = validate_types(
         df
     )
 
-    # --------------------------------------
+    # --------------------------------------------
     # Generate report
-    # --------------------------------------
+    # --------------------------------------------
 
     report = generate_report(
         before_dtypes,
         after_dtypes,
-        conversion_results,
+        conversion_logs,
         validation_results,
         dtype_changes
     )
 
-    # --------------------------------------
-    # Save report
-    # --------------------------------------
-
-    save_report(
-        report,
-        OUTPUT_FILE
-    )
-
-    # --------------------------------------
-    # Save processed dataset
-    # --------------------------------------
+    # --------------------------------------------
+    # Save outputs
+    # --------------------------------------------
 
     save_processed_dataset(
         df,
-        PROCESSED_FILE
+        OUTPUT_FILE
     )
 
-    # --------------------------------------
-    # Print summary
-    # --------------------------------------
+    save_report(
+        report,
+        REPORT_FILE
+    )
 
-    print_summary(
+    # --------------------------------------------
+    # Display results
+    # --------------------------------------------
+
+    print_report(
         before_dtypes,
         after_dtypes,
-        conversion_results,
+        conversion_logs,
         validation_results,
         dtype_changes
-    )
-
-    print(
-        f"\nType enforcement report saved to:"
-        f"\n{OUTPUT_FILE}"
     )
 
     print(
         f"\nType-enforced dataset saved to:"
-        f"\n{PROCESSED_FILE}"
+        f"\n{OUTPUT_FILE}"
     )
 
     print(
-        "\nType enforcement completed successfully."
+        f"\nType enforcement report saved to:"
+        f"\n{REPORT_FILE}"
+    )
+
+    print(
+        "\nData type enforcement completed successfully."
     )
 
 
-# ==========================================
-# Script Entry Point
-# ==========================================
+# ============================================================
+# Entry Point
+# ============================================================
 
 if __name__ == "__main__":
     main()
