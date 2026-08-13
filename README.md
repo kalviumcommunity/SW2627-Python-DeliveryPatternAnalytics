@@ -1,36 +1,58 @@
-# Delivery Pattern Analytics Platform
+# Missing Value Detection & Imputation
 
-## Dataset Profiling & Quality Assessment
+## Overview
 
-### Overview
+This assignment implements the **Missing Value Detection & Imputation** stage of the Delivery Pattern Analytics Platform.
 
-This assignment implements the **Dataset Profiling & Quality Assessment** module for the Delivery Pattern Analytics Platform.
+Real-world delivery datasets can contain incomplete records. Missing delivery times, delivery statuses, or complaint information can affect calculations and downstream analysis.
 
-The purpose of this module is to understand the quality of the dataset before any cleaning, transformation, or analysis is performed.
+The purpose of this module is to:
 
-The profiling process measures completeness, uniqueness, numerical statistics, value distributions, and potential quality issues.
+- Detect missing values before treatment.
+- Select an appropriate strategy based on column type and business context.
+- Impute numerical values using the median.
+- Impute categorical values using the mode.
+- Protect critical identifier fields from artificial values.
+- Compare missing values before and after treatment.
+- Record every imputation decision.
+- Save an audit report explaining the impact of the treatment.
+- Save an imputed dataset for downstream processing.
 
-The profiling step **does not modify or clean the data**. Instead, it produces a structured report that can be used to make informed data-cleaning decisions later.
+The module does **not blindly fill every missing value**. Each treatment is selected intentionally and documented for auditability.
+
+---
+
+## Assignment
+
+**2.18 — Missing Value Detection & Imputation**
+
+The assignment focuses on handling incomplete records using defensible and auditable strategies.
+
+The main principle is:
+
+> Missing values should be handled intentionally based on data type and business context, rather than being filled or deleted without documentation.
 
 ---
 
 ## Objectives
 
-The profiling module is designed to:
+The module is designed to:
 
-- Calculate null counts and null percentages for every column.
-- Identify exact duplicate records.
-- Calculate duplicate percentages.
-- Generate numerical statistics.
-- Profile categorical value distributions.
-- Identify potential data-quality issues.
-- Apply configurable thresholds for nulls and duplicates.
-- Save profiling results as a structured JSON report.
-- Display a readable profiling summary in the terminal.
+1. Analyze missing values before treatment.
+2. Calculate null counts and percentages.
+3. Use median imputation for numerical columns.
+4. Use mode imputation for categorical columns.
+5. Avoid inventing values for critical identifiers.
+6. Drop rows only when a critical identifier is missing.
+7. Analyze missing values after treatment.
+8. Compare before and after results.
+9. Record the reasoning behind every decision.
+10. Save the final imputed dataset.
+11. Save an auditable JSON report.
 
 ---
 
-## Technologies Used
+# Technologies Used
 
 - Python 3.13
 - Pandas
@@ -39,34 +61,30 @@ The profiling module is designed to:
 
 ---
 
-## Project Structure
+# Project Structure
+
+The relevant project files are:
 
 ```text
 SW2627-Python-DeliveryPatternAnalytics/
 │
-├── app/
-│
 ├── data/
-│   ├── raw/
-│   │   ├── deliveries.csv
-│   │   ├── deliveries_semicolon.csv
-│   │   ├── deliveries_nested.json
-│   │   └── delivery_profiling_dataset.xlsx
-│   │
-│   └── processed/
+│   └── raw/
+│       └── delivery_profiling_dataset.xlsx
 │
 ├── scripts/
 │   ├── delivery_workflow.py
 │   ├── data_ingestion.py
-│   └── data_profiling.py
-│
-├── logs/
-│   └── workflow.log
+│   ├── data_profiling.py
+│   ├── type_enforcement.py
+│   └── missing_value_imputation.py
 │
 ├── output/
-│   ├── processed_deliveries.csv
-│   ├── intake_report.json
-│   └── profiling_report.json
+│   ├── profiling_report.json
+│   ├── type_enforcement_report.json
+│   ├── type_enforced_deliveries.csv
+│   ├── imputed_deliveries.csv
+│   └── imputation_audit.json
 │
 ├── requirements.txt
 ├── README.md
