@@ -1,0 +1,43 @@
+{
+    "timestamp": "2026-08-19T11:28:42.211452",
+    "source": "data\\raw\\delivery_profiling_dataset.xlsx",
+    "dataset": {
+        "rows_before": 30,
+        "columns": 11,
+        "column_names": [
+            "delivery_id",
+            "customer_name",
+            "rider_id",
+            "city",
+            "delivery_time_min",
+            "sla_limit_min",
+            "delivery_status",
+            "complaint",
+            "refund_amount",
+            "delivery_date",
+            "payment_method"
+        ]
+    },
+    "duplicate_detection": {
+        "exact_duplicate_rows": 1,
+        "near_duplicate_rows": 1,
+        "near_duplicate_key": [
+            "delivery_id"
+        ]
+    },
+    "deduplication_strategy": {
+        "exact_duplicates": "keep_first",
+        "near_duplicates": "keep_first",
+        "reason": "Keep the first occurrence because the original record is treated as the primary record."
+    },
+    "comparison": {
+        "rows_before": 30,
+        "rows_after": 29,
+        "rows_removed": 1,
+        "removal_pct": 3.33
+    },
+    "validation": {
+        "exact_duplicates_remaining": 0,
+        "near_duplicates_remaining": 0
+    }
+}
