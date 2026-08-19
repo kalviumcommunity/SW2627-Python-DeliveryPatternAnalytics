@@ -1,37 +1,32 @@
 import json
-import os
+from datetime import datetime
+from pathlib import Path
 
 import pandas as pd
 
 
-# ============================================================
-# Configuration
-# ============================================================
+# ---------------------------------------------------------
+# Project paths
+# ---------------------------------------------------------
 
-INPUT_FILE = "data/raw/delivery_profiling_dataset.xlsx"
-
-OUTPUT_FILE = "output/type_enforced_deliveries.csv"
-
-REPORT_FILE = "output/type_enforcement_report.json"
+INPUT_FILE = Path("data/raw/delivery_profiling_dataset.xlsx")
+OUTPUT_DATASET = Path("output/type_enforced_deliveries.csv")
+OUTPUT_REPORT = Path("output/type_enforcement_report.json")
 
 
-# ============================================================
-# Load Dataset
-# ============================================================
+# ---------------------------------------------------------
+# Load dataset
+# ---------------------------------------------------------
 
 def load_dataset(filepath):
-    """
-    Load the delivery dataset from Excel.
+    """Load the Excel dataset."""
 
-    The original source file is never modified.
-    """
-
-    if not os.path.exists(filepath):
+    if not filepath.exists():
         raise FileNotFoundError(
             f"Dataset not found: {filepath}"
         )
 
-    if os.path.getsize(filepath) == 0:
+    if filepath.stat().st_size == 0:
         raise ValueError(
             f"Dataset is empty: {filepath}"
         )
@@ -40,20 +35,18 @@ def load_dataset(filepath):
 
     if df.empty:
         raise ValueError(
-            f"Dataset contains no records: {filepath}"
+            f"Dataset contains no rows: {filepath}"
         )
 
     return df
 
 
-# ============================================================
-# Capture Data Types
-# ============================================================
+# ---------------------------------------------------------
+# Capture data types
+# ---------------------------------------------------------
 
 def capture_dtypes(df):
-    """
-    Capture the current data type of every column.
-    """
+    """Capture the data types of all columns."""
 
     return {
         column: str(dtype)
@@ -61,100 +54,72 @@ def capture_dtypes(df):
     }
 
 
-# ============================================================
-# String -> Datetime
-# ============================================================
+# ---------------------------------------------------------
+# Convert delivery date
+# ---------------------------------------------------------
 
-def enforce_date_type(df):
+def enforce_date_type(df, column="delivery_date"):
     """
-    Convert delivery_date to datetime using an explicit format.
-
-    Expected format:
-        YYYY-MM-DD
-
-    Explicit format is used instead of allowing pandas
-    to infer the format.
+    Convert delivery_date to datetime using
+    an explicit YYYY-MM-DD format.
     """
-
-    column = "delivery_date"
 
     if column not in df.columns:
         raise KeyError(
             f"Required column not found: {column}"
         )
-
-    before_type = str(df[column].dtype)
-
-    conversion_errors = []
-
-    converted_values = []
-
-    for value in df[column]:
-
-        if pd.isna(value):
-            converted_values.append(pd.NaT)
-            continue
-
-        try:
-            converted_value = pd.to_datetime(
-                value,
-                format="%Y-%m-%d"
-            )
-
-            converted_values.append(
-                converted_value
-            )
-
-        except (ValueError, TypeError):
-
-            conversion_errors.append(
-                str(value)
-            )
-
-            converted_values.append(
-                pd.NaT
-            )
-
-    df[column] = pd.to_datetime(
-        converted_values
-    )
-
-    after_type = str(df[column].dtype)
-
-    return {
-        "column": column,
-        "conversion": "string_to_datetime",
-        "before_type": before_type,
-        "after_type": after_type,
-        "format": "%Y-%m-%d",
-        "conversion_errors": conversion_errors
-    }
-
-
-# ============================================================
-# Currency -> Float
-# ============================================================
-
-def enforce_currency_type(df):
-    """
-    Convert refund_amount into float.
-
-    Currency symbols and thousands separators are removed
-    before numeric conversion.
-    """
-
-    column = "refund_amount"
-
-    if column not in df.columns:
-        raise KeyError(
-            f"Required column not found: {column}"
-        )
-
-    before_type = str(df[column].dtype)
 
     original_values = df[column].copy()
 
-    cleaned_values = (
+    try:
+        converted = pd.to_datetime(
+            df[column],
+            format="%Y-%m-%d",
+            errors="coerce"
+        )
+    except Exception as error:
+        raise ValueError(
+            f"Date conversion failed for {column}: {error}"
+        )
+
+    invalid_values = []
+
+    for original, converted_value in zip(
+        original_values,
+        converted
+    ):
+        if pd.notna(original) and pd.isna(converted_value):
+            invalid_values.append(str(original))
+
+    df[column] = converted.astype("datetime64[ns]")
+
+    return {
+        "column": column,
+        "conversion": "string/date → datetime",
+        "format": "%Y-%m-%d",
+        "invalid_values": invalid_values,
+        "invalid_count": len(invalid_values)
+    }
+
+
+# ---------------------------------------------------------
+# Convert currency to float
+# ---------------------------------------------------------
+
+def enforce_currency_type(df, column="refund_amount"):
+    """
+    Remove currency symbols and commas and
+    convert the column to float.
+    """
+
+    if column not in df.columns:
+        raise KeyError(
+            f"Required column not found: {column}"
+        )
+
+    original_values = df[column].copy()
+
+    cleaned = (
         df[column]
         .astype("string")
         .str.replace("$", "", regex=False)
@@ -162,69 +127,46 @@ def enforce_currency_type(df):
         .str.strip()
     )
 
-    numeric_values = pd.to_numeric(
-        cleaned_values,
+    converted = pd.to_numeric(
+        cleaned,
         errors="coerce"
     )
 
-    conversion_errors = []
+    invalid_values = []
 
-    for original, converted in zip(
+    for original, converted_value in zip(
         original_values,
-        numeric_values
+        converted
     ):
+        if pd.notna(original) and pd.isna(converted_value):
+            invalid_values.append(str(original))
 
-        if (
-            pd.notna(original)
-            and pd.isna(converted)
-        ):
-            conversion_errors.append(
-                str(original)
-            )
-
-    df[column] = numeric_values.astype(float)
-
-    after_type = str(df[column].dtype)
+    df[column] = converted.astype(float)
 
     return {
         "column": column,
-        "conversion": "currency_to_float",
-        "before_type": before_type,
-        "after_type": after_type,
-        "currency_symbols_removed": [
-            "$",
-            ","
-        ],
-        "conversion_errors": conversion_errors
+        "conversion": "currency → float",
+        "invalid_values": invalid_values,
+        "invalid_count": len(invalid_values)
     }
 
 
-# ============================================================
-# Integer / Text -> Boolean
-# ============================================================
+# ---------------------------------------------------------
+# Convert complaint to boolean
+# ---------------------------------------------------------
 
-def enforce_boolean_type(df):
+def enforce_boolean_type(df, column="complaint"):
     """
-    Convert complaint values to proper Boolean values.
-
-    Supported values include:
-
-        Yes / No
-        yes / no
-        True / False
-        1 / 0
-
-    Missing values remain missing.
+    Convert complaint values such as Yes/No
+    and 1/0 into Boolean values.
     """
-
-    column = "complaint"
 
     if column not in df.columns:
         raise KeyError(
             f"Required column not found: {column}"
         )
 
-    before_type = str(df[column].dtype)
+    original_values = df[column].copy()
 
     mapping = {
         "yes": True,
@@ -232,180 +174,195 @@ def enforce_boolean_type(df):
         "true": True,
         "false": False,
         "1": True,
-        "0": False
+        "0": False,
+        1: True,
+        0: False,
+        True: True,
+        False: False
     }
 
-    conversion_errors = []
-
-    converted_values = []
-
-    for value in df[column]:
-
+    def convert_value(value):
         if pd.isna(value):
+            return pd.NA
 
-            converted_values.append(
-                pd.NA
-            )
+        if isinstance(value, str):
+            cleaned = value.strip().lower()
 
-            continue
+            if cleaned in mapping:
+                return mapping[cleaned]
 
-        normalized_value = (
-            str(value)
-            .strip()
-            .lower()
-        )
+        if value in mapping:
+            return mapping[value]
 
-        if normalized_value in mapping:
+        return pd.NA
 
-            converted_values.append(
-                mapping[normalized_value]
-            )
+    converted = original_values.map(convert_value)
 
-        else:
+    invalid_values = []
 
-            conversion_errors.append(
-                str(value)
-            )
+    for original, converted_value in zip(
+        original_values,
+        converted
+    ):
+        if pd.notna(original) and pd.isna(converted_value):
+            invalid_values.append(str(original))
 
-            converted_values.append(
-                pd.NA
-            )
-
-    df[column] = pd.Series(
-        converted_values,
-        index=df.index,
-        dtype="boolean"
-    )
-
-    after_type = str(df[column].dtype)
+    df[column] = converted.astype("boolean")
 
     return {
         "column": column,
-        "conversion": "value_to_boolean",
-        "before_type": before_type,
-        "after_type": after_type,
-        "mapping": mapping,
-        "conversion_errors": conversion_errors
+        "conversion": "text/integer → boolean",
+        "invalid_values": invalid_values,
+        "invalid_count": len(invalid_values)
     }
 
 
-# ============================================================
-# Validate Types
-# ============================================================
+# ---------------------------------------------------------
+# Compare data types
+# ---------------------------------------------------------
 
-def validate_types(df):
-    """
-    Validate that required columns have the expected
-    final data types.
-    """
-
-    results = {}
-
-    # --------------------------------------------
-    # Date
-    # --------------------------------------------
-
-    results["delivery_date"] = {
-        "expected_type": "datetime64[ns]",
-        "actual_type": str(
-            df["delivery_date"].dtype
-        ),
-        "valid": pd.api.types.is_datetime64_any_dtype(
-            df["delivery_date"]
-        )
-    }
-
-    # --------------------------------------------
-    # Currency
-    # --------------------------------------------
-
-    results["refund_amount"] = {
-        "expected_type": "float64",
-        "actual_type": str(
-            df["refund_amount"].dtype
-        ),
-        "valid": pd.api.types.is_float_dtype(
-            df["refund_amount"]
-        )
-    }
-
-    # --------------------------------------------
-    # Boolean
-    # --------------------------------------------
-
-    results["complaint"] = {
-        "expected_type": "boolean",
-        "actual_type": str(
-            df["complaint"].dtype
-        ),
-        "valid": str(
-            df["complaint"].dtype
-        ) == "boolean"
-    }
-
-    return results
-
-
-# ============================================================
-# Compare Before and After Types
-# ============================================================
-
-def compare_dtypes(before_dtypes, after_dtypes):
-    """
-    Identify columns whose data types changed.
-    """
+def compare_dtypes(before, after):
+    """Compare data types before and after enforcement."""
 
     changes = {}
 
-    for column in after_dtypes:
-
-        before_type = before_dtypes.get(
-            column
-        )
-
-        after_type = after_dtypes[column]
-
-        if before_type != after_type:
-
+    for column in before:
+        if column in after and before[column] != after[column]:
             changes[column] = {
-                "before": before_type,
-                "after": after_type
+                "before": before[column],
+                "after": after[column]
             }
 
     return changes
 
 
-# ============================================================
-# Generate Report
-# ============================================================
+# ---------------------------------------------------------
+# Validate final types
+# ---------------------------------------------------------
 
-def generate_report(
-    before_dtypes,
-    after_dtypes,
-    conversion_logs,
-    validation_results,
-    dtype_changes
-):
-    """
-    Generate the complete type-enforcement report.
-    """
+def validate_types(df):
+    """Validate that required columns have expected types."""
 
-    all_valid = all(
-        result["valid"]
-        for result in validation_results.values()
+    expected_types = {
+        "delivery_date": "datetime64[ns]",
+        "refund_amount": "float64",
+        "complaint": "boolean"
+    }
+
+    validation = {}
+    all_valid = True
+
+    for column, expected_type in expected_types.items():
+
+        if column not in df.columns:
+            validation[column] = {
+                "status": "FAIL",
+                "expected": expected_type,
+                "actual": "column missing"
+            }
+
+            all_valid = False
+            continue
+
+        actual_type = str(df[column].dtype)
+
+        passed = actual_type == expected_type
+
+        validation[column] = {
+            "status": "PASS" if passed else "FAIL",
+            "expected": expected_type,
+            "actual": actual_type
+        }
+
+        if not passed:
+            all_valid = False
+
+    return validation, all_valid
+
+
+# ---------------------------------------------------------
+# Generate report
+# ---------------------------------------------------------
+
+def generate_report(filepath):
+    """Run the complete type enforcement workflow."""
+
+    print("\nStarting Data Type Enforcement & Standardisation...\n")
+
+    df = load_dataset(filepath)
+
+    print(f"Dataset loaded: {filepath}")
+    print(f"Rows: {len(df)}")
+    print(f"Columns: {len(df.columns)}")
+
+    # Capture original data types
+    before_dtypes = capture_dtypes(df)
+
+    print("\nOriginal Data Types:")
+    for column, dtype in before_dtypes.items():
+        print(f"  {column}: {dtype}")
+
+    # Apply conversions
+    print("\nApplying type conversions...")
+
+    conversion_logs = []
+
+    date_log = enforce_date_type(
+        df,
+        "delivery_date"
+    )
+    conversion_logs.append(date_log)
+
+    currency_log = enforce_currency_type(
+        df,
+        "refund_amount"
+    )
+    conversion_logs.append(currency_log)
+
+    boolean_log = enforce_boolean_type(
+        df,
+        "complaint"
+    )
+    conversion_logs.append(boolean_log)
+
+    # Capture final data types
+    after_dtypes = capture_dtypes(df)
+
+    # Compare data types
+    dtype_changes = compare_dtypes(
+        before_dtypes,
+        after_dtypes
     )
 
-    return {
+    # Validate final types
+    validation, all_valid = validate_types(df)
 
-        "timestamp": pd.Timestamp.now().isoformat(),
+    # Create output folders
+    OUTPUT_DATASET.parent.mkdir(
+        parents=True,
+        exist_ok=True
+    )
 
-        "source": INPUT_FILE,
+    OUTPUT_REPORT.parent.mkdir(
+        parents=True,
+        exist_ok=True
+    )
 
-        "summary": {
-            "all_required_types_valid": all_valid,
-            "columns_changed": len(
-                dtype_changes
-            )
+    # Save processed dataset
+    df.to_csv(
+        OUTPUT_DATASET,
+        index=False
+    )
+
+    # Create report
+    report = {
+        "timestamp": datetime.now().isoformat(),
+        "source": str(filepath),
+
+        "dataset": {
+            "rows": len(df),
+            "columns": len(df.columns),
+            "column_names": list(df.columns)
         },
 
         "before_dtypes": before_dtypes,
@@ -416,33 +373,20 @@ def generate_report(
 
         "conversion_logs": conversion_logs,
 
-        "validation": validation_results
+        "validation": validation,
+
+        "summary": {
+            "columns_changed": len(dtype_changes),
+            "all_required_types_valid": all_valid
+        }
     }
 
-
-# ============================================================
-# Save Report
-# ============================================================
-
-def save_report(report, filepath):
-    """
-    Save the report as JSON.
-    """
-
-    directory = os.path.dirname(filepath)
-
-    if directory:
-        os.makedirs(
-            directory,
-            exist_ok=True
-        )
-
+    # Save JSON report
     with open(
-        filepath,
+        OUTPUT_REPORT,
         "w",
         encoding="utf-8"
     ) as file:
-
         json.dump(
             report,
             file,
@@ -450,314 +394,81 @@ def save_report(report, filepath):
             default=str
         )
 
-
-# ============================================================
-# Save Processed Dataset
-# ============================================================
-
-def save_processed_dataset(df, filepath):
-    """
-    Save the type-enforced dataset.
-    """
-
-    directory = os.path.dirname(filepath)
-
-    if directory:
-        os.makedirs(
-            directory,
-            exist_ok=True
-        )
-
-    df.to_csv(
-        filepath,
-        index=False
-    )
-
-
-# ============================================================
-# Print Report
-# ============================================================
-
-def print_report(
-    before_dtypes,
-    after_dtypes,
-    conversion_logs,
-    validation_results,
-    dtype_changes
-):
-    """
-    Print a readable report to the terminal.
-    """
-
-    print("\n" + "=" * 65)
+    # Display results
+    print("\n" + "=" * 60)
     print("DATA TYPE ENFORCEMENT REPORT")
-    print("=" * 65)
+    print("=" * 60)
 
-    # --------------------------------------------
-    # Data type changes
-    # --------------------------------------------
-
-    print("\nDATA TYPE CHANGES")
+    print("\nData Type Changes:")
 
     if dtype_changes:
-
         for column, change in dtype_changes.items():
-
             print(
                 f"  {column}: "
-                f"{change['before']} -> "
+                f"{change['before']} → "
                 f"{change['after']}"
             )
-
     else:
+        print("  No data type changes detected.")
 
+    print("\nType Validation:")
+
+    for column, result in validation.items():
         print(
-            "  No data type changes detected."
+            f"  {column}: {result['status']}"
+        )
+        print(
+            f"    Expected: {result['expected']}"
+        )
+        print(
+            f"    Actual:   {result['actual']}"
         )
 
-    # --------------------------------------------
-    # Conversion logs
-    # --------------------------------------------
+    print("\nConversion Errors:")
 
-    print("\nCONVERSIONS")
+    total_errors = 0
 
     for log in conversion_logs:
+        count = log["invalid_count"]
+        total_errors += count
 
         print(
-            f"  Column: {log['column']}"
+            f"  {log['column']}: "
+            f"{count} invalid value(s)"
         )
 
-        print(
-            f"  Conversion: "
-            f"{log['conversion']}"
-        )
-
-        print(
-            f"  Before: "
-            f"{log['before_type']}"
-        )
-
-        print(
-            f"  After: "
-            f"{log['after_type']}"
-        )
-
-        if log["conversion_errors"]:
-
-            print(
-                "  Conversion errors: "
-                f"{log['conversion_errors']}"
-            )
-
-        else:
-
-            print(
-                "  Conversion errors: None"
-            )
-
-        print()
-
-    # --------------------------------------------
-    # Validation
-    # --------------------------------------------
-
-    print("TYPE VALIDATION")
-
-    for column, result in validation_results.items():
-
-        status = (
-            "PASS"
-            if result["valid"]
-            else "FAIL"
-        )
-
-        print(
-            f"  {column}: {status}"
-        )
-
-        print(
-            f"    Expected: "
-            f"{result['expected_type']}"
-        )
-
-        print(
-            f"    Actual: "
-            f"{result['actual_type']}"
-        )
-
-    # --------------------------------------------
-    # Original types
-    # --------------------------------------------
-
-    print("\nORIGINAL DATA TYPES")
-
-    for column, dtype in before_dtypes.items():
-
-        print(
-            f"  {column}: {dtype}"
-        )
-
-    # --------------------------------------------
-    # Final types
-    # --------------------------------------------
-
-    print("\nFINAL DATA TYPES")
-
-    for column, dtype in after_dtypes.items():
-
-        print(
-            f"  {column}: {dtype}"
-        )
-
-    print("=" * 65)
-
-
-# ============================================================
-# Main Workflow
-# ============================================================
-
-def main():
+    print("\n" + "=" * 60)
 
     print(
-        "\nStarting Data Type Enforcement "
-        "& Standardisation..."
-    )
-
-    # --------------------------------------------
-    # Load dataset
-    # --------------------------------------------
-
-    df = load_dataset(
-        INPUT_FILE
-    )
-
-    # --------------------------------------------
-    # Capture original types
-    # --------------------------------------------
-
-    before_dtypes = capture_dtypes(
-        df
-    )
-
-    conversion_logs = []
-
-    # --------------------------------------------
-    # Date conversion
-    # --------------------------------------------
-
-    date_log = enforce_date_type(
-        df
-    )
-
-    conversion_logs.append(
-        date_log
-    )
-
-    # --------------------------------------------
-    # Currency conversion
-    # --------------------------------------------
-
-    currency_log = enforce_currency_type(
-        df
-    )
-
-    conversion_logs.append(
-        currency_log
-    )
-
-    # --------------------------------------------
-    # Boolean conversion
-    # --------------------------------------------
-
-    boolean_log = enforce_boolean_type(
-        df
-    )
-
-    conversion_logs.append(
-        boolean_log
-    )
-
-    # --------------------------------------------
-    # Capture final types
-    # --------------------------------------------
-
-    after_dtypes = capture_dtypes(
-        df
-    )
-
-    # --------------------------------------------
-    # Compare data types
-    # --------------------------------------------
-
-    dtype_changes = compare_dtypes(
-        before_dtypes,
-        after_dtypes
-    )
-
-    # --------------------------------------------
-    # Validate conversions
-    # --------------------------------------------
-
-    validation_results = validate_types(
-        df
-    )
-
-    # --------------------------------------------
-    # Generate report
-    # --------------------------------------------
-
-    report = generate_report(
-        before_dtypes,
-        after_dtypes,
-        conversion_logs,
-        validation_results,
-        dtype_changes
-    )
-
-    # --------------------------------------------
-    # Save outputs
-    # --------------------------------------------
-
-    save_processed_dataset(
-        df,
-        OUTPUT_FILE
-    )
-
-    save_report(
-        report,
-        REPORT_FILE
-    )
-
-    # --------------------------------------------
-    # Display results
-    # --------------------------------------------
-
-    print_report(
-        before_dtypes,
-        after_dtypes,
-        conversion_logs,
-        validation_results,
-        dtype_changes
-    )
-
-    print(
-        f"\nType-enforced dataset saved to:"
-        f"\n{OUTPUT_FILE}"
+        f"\nProcessed dataset saved to:"
+        f"\n{OUTPUT_DATASET}"
     )
 
     print(
         f"\nType enforcement report saved to:"
-        f"\n{REPORT_FILE}"
+        f"\n{OUTPUT_REPORT}"
     )
 
-    print(
-        "\nData type enforcement completed successfully."
-    )
+    if all_valid:
+        print(
+            "\nData type enforcement completed successfully."
+        )
+    else:
+        print(
+            "\nData type enforcement completed "
+            "with validation failures."
+        )
+
+    return report
 
 
-# ============================================================
-# Entry Point
-# ============================================================
+# ---------------------------------------------------------
+# Main
+# ---------------------------------------------------------
+
+def main():
+    generate_report(INPUT_FILE)
+
 
 if __name__ == "__main__":
     main()

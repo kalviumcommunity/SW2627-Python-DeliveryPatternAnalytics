@@ -1,9 +1,22 @@
 {
-    "timestamp": "2026-08-13T12:33:47.002559",
-    "source": "data/raw/delivery_profiling_dataset.xlsx",
-    "summary": {
-        "all_required_types_valid": true,
-        "columns_changed": 3
+    "timestamp": "2026-08-19T11:15:26.165407",
+    "source": "data\\raw\\delivery_profiling_dataset.xlsx",
+    "dataset": {
+        "rows": 30,
+        "columns": 11,
+        "column_names": [
+            "delivery_id",
+            "customer_name",
+            "rider_id",
+            "city",
+            "delivery_time_min",
+            "sla_limit_min",
+            "delivery_status",
+            "complaint",
+            "refund_amount",
+            "delivery_date",
+            "payment_method"
+        ]
     },
     "before_dtypes": {
         "delivery_id": "int64",
@@ -28,7 +41,7 @@
         "delivery_status": "str",
         "complaint": "boolean",
         "refund_amount": "float64",
-        "delivery_date": "datetime64[us]",
+        "delivery_date": "datetime64[ns]",
         "payment_method": "str"
     },
     "dtype_changes": {
@@ -42,60 +55,49 @@
         },
         "delivery_date": {
             "before": "str",
-            "after": "datetime64[us]"
+            "after": "datetime64[ns]"
         }
     },
     "conversion_logs": [
         {
             "column": "delivery_date",
-            "conversion": "string_to_datetime",
-            "before_type": "str",
-            "after_type": "datetime64[us]",
+            "conversion": "string/date \u2192 datetime",
             "format": "%Y-%m-%d",
-            "conversion_errors": []
+            "invalid_values": [],
+            "invalid_count": 0
         },
         {
             "column": "refund_amount",
-            "conversion": "currency_to_float",
-            "before_type": "int64",
-            "after_type": "float64",
-            "currency_symbols_removed": [
-                "$",
-                ","
-            ],
-            "conversion_errors": []
+            "conversion": "currency \u2192 float",
+            "invalid_values": [],
+            "invalid_count": 0
         },
         {
             "column": "complaint",
-            "conversion": "value_to_boolean",
-            "before_type": "str",
-            "after_type": "boolean",
-            "mapping": {
-                "yes": true,
-                "no": false,
-                "true": true,
-                "false": false,
-                "1": true,
-                "0": false
-            },
-            "conversion_errors": []
+            "conversion": "text/integer \u2192 boolean",
+            "invalid_values": [],
+            "invalid_count": 0
         }
     ],
     "validation": {
         "delivery_date": {
-            "expected_type": "datetime64[ns]",
-            "actual_type": "datetime64[us]",
-            "valid": true
+            "status": "PASS",
+            "expected": "datetime64[ns]",
+            "actual": "datetime64[ns]"
         },
         "refund_amount": {
-            "expected_type": "float64",
-            "actual_type": "float64",
-            "valid": true
+            "status": "PASS",
+            "expected": "float64",
+            "actual": "float64"
         },
         "complaint": {
-            "expected_type": "boolean",
-            "actual_type": "boolean",
-            "valid": true
+            "status": "PASS",
+            "expected": "boolean",
+            "actual": "boolean"
         }
+    },
+    "summary": {
+        "columns_changed": 3,
+        "all_required_types_valid": true
     }
 }
