@@ -1,0 +1,2 @@
+delivery_id,customer_name,rider_id,city,delivery_time_min,sla_limit_min,delivery_status,complaint,refund_amount,delivery_date,payment_method
+1007,Mohit Kumar,R007,Mumbai,48.0,30,Delayed,Yes,150,2026-07-04,Cash
