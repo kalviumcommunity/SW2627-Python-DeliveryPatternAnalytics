@@ -1,0 +1,124 @@
+{
+    "timestamp": "2026-08-19T14:13:44.131053",
+    "source": "data\\raw\\delivery_profiling_dataset.xlsx",
+    "dataset": {
+        "rows": 30,
+        "columns": 11
+    },
+    "cleaning_operations": {
+        "customer_name": [
+            "strip whitespace"
+        ],
+        "city": [
+            "strip whitespace",
+            "normalize casing",
+            "remove special characters",
+            "standardize city names"
+        ],
+        "delivery_status": [
+            "strip whitespace",
+            "normalize casing",
+            "standardize status labels"
+        ],
+        "complaint": [
+            "strip whitespace",
+            "normalize casing",
+            "standardize Yes/No labels"
+        ],
+        "payment_method": [
+            "strip whitespace",
+            "normalize casing",
+            "standardize payment labels"
+        ]
+    },
+    "changes": {
+        "customer_name": 2,
+        "city": 0,
+        "delivery_status": 0,
+        "complaint": 0,
+        "payment_method": 0
+    },
+    "total_values_changed": 2,
+    "value_distributions_before": {
+        "customer_name": {
+            "Aarav Sharma": 3,
+            "Sneha Iyer": 3,
+            "Priya Singh": 2,
+            "Rahul Verma": 2,
+            "Neha Gupta": 2,
+            "Riya Patel": 2,
+            "Mohit Kumar": 2,
+            "Vikram Rao": 2,
+            "Ananya Mehta": 2,
+            "Karan Joshi": 2,
+            "Rohit Das": 2,
+            "Meera Shah": 2,
+            "Arjun Nair": 2,
+            "Priya  Singh": 1,
+            "PRIYA SINGH": 1
+        },
+        "city": {
+            "Delhi": 9,
+            "Mumbai": 8,
+            "Bangalore": 4,
+            "Pune": 4,
+            "Chennai": 3,
+            "Hyderabad": 2
+        },
+        "delivery_status": {
+            "Delayed": 17,
+            "On Time": 12,
+            "<NA>": 1
+        },
+        "complaint": {
+            "No": 17,
+            "Yes": 12,
+            "<NA>": 1
+        },
+        "payment_method": {
+            "UPI": 13,
+            "Card": 9,
+            "Cash": 8
+        }
+    },
+    "value_distributions_after": {
+        "customer_name": {
+            "Priya Singh": 4,
+            "Aarav Sharma": 3,
+            "Sneha Iyer": 3,
+            "Rahul Verma": 2,
+            "Neha Gupta": 2,
+            "Riya Patel": 2,
+            "Mohit Kumar": 2,
+            "Vikram Rao": 2,
+            "Ananya Mehta": 2,
+            "Karan Joshi": 2,
+            "Rohit Das": 2,
+            "Meera Shah": 2,
+            "Arjun Nair": 2
+        },
+        "city": {
+            "Delhi": 9,
+            "Mumbai": 8,
+            "Bangalore": 4,
+            "Pune": 4,
+            "Chennai": 3,
+            "Hyderabad": 2
+        },
+        "delivery_status": {
+            "Delayed": 17,
+            "On Time": 12,
+            "<NA>": 1
+        },
+        "complaint": {
+            "No": 17,
+            "Yes": 12,
+            "<NA>": 1
+        },
+        "payment_method": {
+            "UPI": 13,
+            "Card": 9,
+            "Cash": 8
+        }
+    }
+}
