@@ -1,12 +1,10 @@
-import os
-import pandas as pd
 import streamlit as st
+import pandas as pd
 
 
-DATA_FILE = "output/feature_engineered_dataset.csv"
-DAILY_FILE = "output/time_series_daily.csv"
-WEEKLY_FILE = "output/time_series_weekly.csv"
-
+# --------------------------------------------------
+# Page Configuration
+# --------------------------------------------------
 
 st.set_page_config(
     page_title="Delivery Pattern Analytics",
@@ -15,62 +13,11 @@ st.set_page_config(
 )
 
 
-@st.cache_data
-def load_data():
-    """Load the main feature-engineered dataset."""
-
-    if not os.path.exists(DATA_FILE):
-        raise FileNotFoundError(
-            f"Dataset not found: {DATA_FILE}"
-        )
-
-    df = pd.read_csv(DATA_FILE)
-
-    if "delivery_date" in df.columns:
-        df["delivery_date"] = pd.to_datetime(
-            df["delivery_date"],
-            errors="coerce"
-        )
-
-    return df
-
-
-@st.cache_data
-def load_time_series():
-    """Load time-series outputs."""
-
-    daily = pd.read_csv(DAILY_FILE)
-    weekly = pd.read_csv(WEEKLY_FILE)
-
-    daily["delivery_date"] = pd.to_datetime(
-        daily["delivery_date"],
-        errors="coerce"
-    )
-
-    weekly["delivery_date"] = pd.to_datetime(
-        weekly["delivery_date"],
-        errors="coerce"
-    )
-
-    return daily, weekly
-
-
-# --------------------------------------------------
-# Load data
-# --------------------------------------------------
-
-df = load_data()
-
-daily, weekly = load_time_series()
-
-
 # --------------------------------------------------
 # Sidebar Navigation
 # --------------------------------------------------
 
 st.sidebar.title("🚚 Delivery Analytics")
-
-st.sidebar.subheader("Navigation")
 
 page = st.sidebar.radio(
     "Go to",
@@ -78,7 +25,8 @@ page = st.sidebar.radio(
         "Overview",
         "Trends",
         "Segments",
-        "Data Explorer"
+        "Data Explorer",
+        "Dataset Upload"
     ]
 )
 
@@ -91,62 +39,17 @@ if page == "Overview":
 
     st.title("Delivery Pattern Analytics")
 
-    st.subheader("Business Overview")
+    st.header("Business Overview")
 
     st.write(
-        "Overview of delivery performance, customer complaints, "
-        "refunds, and SLA performance."
+        "Overview of delivery performance and business metrics."
     )
 
     st.divider()
 
-    # KPI cards
-    col1, col2, col3, col4 = st.columns(4)
-
-    with col1:
-        st.metric(
-            "Total Deliveries",
-            len(df)
-        )
-
-    with col2:
-        st.metric(
-            "Avg Delivery Time",
-            f"{df['delivery_time_min'].mean():.1f} min"
-        )
-
-    with col3:
-        st.metric(
-            "Total Refund",
-            f"{df['refund_amount'].sum():.2f}"
-        )
-
-    with col4:
-        complaint_rate = (
-            df["complaint"].eq("Yes").mean() * 100
-        )
-
-        st.metric(
-            "Complaint Rate",
-            f"{complaint_rate:.1f}%"
-        )
-
-    st.divider()
-
-    st.header("Delivery Performance")
-
-    performance_counts = (
-        df["delivery_performance"]
-        .value_counts()
+    st.info(
+        "Use the Dataset Upload section to upload your own CSV or JSON file."
     )
-
-    st.bar_chart(performance_counts)
-
-    with st.expander("View Raw Delivery Data"):
-        st.dataframe(
-            df,
-            use_container_width=True
-        )
 
 
 # --------------------------------------------------
@@ -158,40 +61,12 @@ elif page == "Trends":
     st.title("Trend Analysis")
 
     st.write(
-        "Time-series view of delivery performance and refunds."
+        "This section is used for time-series analysis."
     )
 
-    st.divider()
-
-    st.header("Delivery Time Trend")
-
-    st.line_chart(
-        daily.set_index("delivery_date")[
-            [
-                "avg_delivery_time",
-                "delivery_time_ma7"
-            ]
-        ]
+    st.info(
+        "Existing time-series analysis can be displayed here."
     )
-
-    st.divider()
-
-    st.header("Refund Trend")
-
-    st.line_chart(
-        daily.set_index("delivery_date")[
-            [
-                "total_refund",
-                "refund_ma7"
-            ]
-        ]
-    )
-
-    with st.expander("View Weekly Metrics"):
-        st.dataframe(
-            weekly,
-            use_container_width=True
-        )
 
 
 # --------------------------------------------------
@@ -203,45 +78,12 @@ elif page == "Segments":
     st.title("Segment Breakdown")
 
     st.write(
-        "Compare delivery performance across different cities "
-        "and quality tiers."
+        "This section is used for segment-level analysis."
     )
 
-    st.divider()
-
-    st.header("Performance by City")
-
-    city_metrics = (
-        df.groupby("city")
-        .agg(
-            deliveries=("delivery_id", "count"),
-            avg_delivery_time=("delivery_time_min", "mean"),
-            total_refund=("refund_amount", "sum")
-        )
-        .reset_index()
+    st.info(
+        "Existing segment analysis can be displayed here."
     )
-
-    st.dataframe(
-        city_metrics,
-        use_container_width=True
-    )
-
-    st.bar_chart(
-        city_metrics.set_index("city")[
-            "avg_delivery_time"
-        ]
-    )
-
-    st.divider()
-
-    st.header("Delivery Quality Tiers")
-
-    quality_counts = (
-        df["delivery_quality_tier"]
-        .value_counts()
-    )
-
-    st.bar_chart(quality_counts)
 
 
 # --------------------------------------------------
@@ -256,54 +98,207 @@ elif page == "Data Explorer":
         "Explore the processed delivery dataset."
     )
 
+    st.info(
+        "Use Dataset Upload to bring a new dataset into the application."
+    )
+
+
+# --------------------------------------------------
+# Dataset Upload
+# --------------------------------------------------
+
+elif page == "Dataset Upload":
+
+    st.title("Dataset Upload")
+
+    st.write(
+        "Upload a CSV or JSON dataset to preview and analyse it."
+    )
+
     st.divider()
 
-    st.header("Filters")
-
-    selected_city = st.selectbox(
-        "Select City",
-        ["All"] + sorted(df["city"].dropna().unique().tolist())
+    # File uploader
+    uploaded_file = st.file_uploader(
+        "Upload your dataset",
+        type=["csv", "json"]
     )
 
-    filtered_df = df.copy()
+    # --------------------------------------------------
+    # No file uploaded
+    # --------------------------------------------------
 
-    if selected_city != "All":
-        filtered_df = filtered_df[
-            filtered_df["city"] == selected_city
-        ]
+    if uploaded_file is None:
 
-    st.subheader(
-        f"Records: {len(filtered_df)}"
-    )
-
-    st.dataframe(
-        filtered_df,
-        use_container_width=True
-    )
-
-    with st.expander("Dataset Information"):
-
-        st.write(
-            f"Rows: {df.shape[0]}"
+        st.info(
+            "Upload a CSV or JSON file to begin."
         )
 
-        st.write(
-            f"Columns: {df.shape[1]}"
-        )
+    # --------------------------------------------------
+    # File uploaded
+    # --------------------------------------------------
 
-        st.write(
-            "Available columns:"
-        )
+    else:
 
-        st.write(
-            df.columns.tolist()
-        )
+        try:
 
-    csv_data = filtered_df.to_csv(index=False)
+            # Load CSV
+            if uploaded_file.name.lower().endswith(".csv"):
 
-    st.download_button(
-        label="Download Filtered Data",
-        data=csv_data,
-        file_name="filtered_delivery_data.csv",
-        mime="text/csv"
-    )
+                df = pd.read_csv(uploaded_file)
+
+            # Load JSON
+            elif uploaded_file.name.lower().endswith(".json"):
+
+                df = pd.read_json(uploaded_file)
+
+            # Unsupported format
+            else:
+
+                st.error(
+                    "Unsupported file type. Please upload CSV or JSON."
+                )
+
+                st.stop()
+
+
+            # --------------------------------------------------
+            # Empty Dataset Check
+            # --------------------------------------------------
+
+            if len(df) == 0:
+
+                st.warning(
+                    "The uploaded file is empty. Please check your data."
+                )
+
+                st.stop()
+
+
+            # --------------------------------------------------
+            # Successful Upload
+            # --------------------------------------------------
+
+            st.success(
+                f"File loaded successfully: {uploaded_file.name}"
+            )
+
+
+            # --------------------------------------------------
+            # Dataset Summary
+            # --------------------------------------------------
+
+            st.header("Dataset Summary")
+
+            col1, col2, col3 = st.columns(3)
+
+            with col1:
+
+                st.metric(
+                    "Rows",
+                    f"{len(df):,}"
+                )
+
+            with col2:
+
+                st.metric(
+                    "Columns",
+                    str(len(df.columns))
+                )
+
+            with col3:
+
+                total_nulls = df.isnull().sum().sum()
+
+                total_cells = df.shape[0] * df.shape[1]
+
+                if total_cells > 0:
+
+                    null_percentage = (
+                        total_nulls / total_cells
+                    ) * 100
+
+                else:
+
+                    null_percentage = 0
+
+                st.metric(
+                    "Null %",
+                    f"{null_percentage:.1f}%"
+                )
+
+
+            st.divider()
+
+
+            # --------------------------------------------------
+            # First 10 Rows
+            # --------------------------------------------------
+
+            st.subheader("First 10 Rows")
+
+            st.dataframe(
+                df.head(10),
+                use_container_width=True
+            )
+
+
+            st.divider()
+
+
+            # --------------------------------------------------
+            # Column Summary
+            # --------------------------------------------------
+
+            st.subheader("Column Summary")
+
+            summary = pd.DataFrame({
+
+                "Column": df.columns,
+
+                "Type": df.dtypes.astype(str).values,
+
+                "Non-Null": df.notnull().sum().values,
+
+                "Null Count": df.isnull().sum().values,
+
+                "Null %": (
+                    df.isnull().sum()
+                    / len(df)
+                    * 100
+                ).round(1).values
+
+            })
+
+            st.dataframe(
+                summary,
+                use_container_width=True
+            )
+
+
+            st.divider()
+
+
+            # --------------------------------------------------
+            # Descriptive Statistics
+            # --------------------------------------------------
+
+            st.subheader("Descriptive Statistics")
+
+            st.dataframe(
+                df.describe(),
+                use_container_width=True
+            )
+
+
+        # --------------------------------------------------
+        # Error Handling
+        # --------------------------------------------------
+
+        except Exception:
+
+            st.error(
+                "Could not read this file. "
+                "Please check that the file format is valid."
+            )
+
+            st.stop()
