@@ -1,0 +1,35 @@
+{
+    "source": "data\\raw\\delivery_profiling_dataset.xlsx",
+    "dataset": {
+        "rows": 30,
+        "columns_before": 11,
+        "columns_after": 18
+    },
+    "feature_engineering": {
+        "features_created": [
+            "delivery_time_sla_ratio",
+            "sla_difference_min",
+            "refund_per_delivery_min",
+            "delivery_performance",
+            "delivery_time_category",
+            "delivery_quality_score",
+            "delivery_quality_tier"
+        ],
+        "feature_count": 7
+    },
+    "feature_definitions": {
+        "delivery_time_sla_ratio": "delivery_time_min divided by sla_limit_min",
+        "sla_difference_min": "sla_limit_min minus delivery_time_min",
+        "refund_per_delivery_min": "refund_amount divided by delivery_time_min",
+        "delivery_performance": "Categorises delivery as fast, within SLA, or delayed",
+        "delivery_time_category": "Categorises delivery duration as short, medium, or long",
+        "delivery_quality_score": "Score from 0 to 3 based on SLA, complaint, and refund status",
+        "delivery_quality_tier": "Low, medium, or high quality delivery tier"
+    },
+    "validation": {
+        "delivery_time_sla_ratio_non_negative": false,
+        "delivery_quality_score_range": true,
+        "sla_difference_calculated": false,
+        "feature_rows_match": true
+    }
+}
