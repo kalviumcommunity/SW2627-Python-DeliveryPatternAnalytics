@@ -1,0 +1,22 @@
+{
+    "assignment": "2.27 - Systematic Data Validation",
+    "dataset": {
+        "source": "data\\raw\\delivery_profiling_dataset.xlsx",
+        "rows": 30,
+        "columns": 11,
+        "column_names": []
+    },
+    "validation_summary": {
+        "total_rules": 12,
+        "passed_rules": 0,
+        "failed_rules": 0,
+        "records_checked": 30,
+        "records_passed": 0,
+        "records_failed": 0
+    },
+    "validation_rules": [],
+    "outputs": {
+        "validation_report": "output\\validation_report.json",
+        "validation_failures": "output\\validation_failures.csv"
+    }
+}
