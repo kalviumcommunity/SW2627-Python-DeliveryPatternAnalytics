@@ -1,0 +1,7 @@
+city,total_records,average_delivery_time,average_refund,complaint_rate,delayed_rate
+Bangalore,4,24.75,0.0,0.0,0.0
+Chennai,3,39.5,86.67,66.67,66.67
+Delhi,9,39.88,70.0,55.56,66.67
+Hyderabad,2,36.5,0.0,0.0,100.0
+Mumbai,8,33.5,78.75,62.5,75.0
+Pune,4,27.0,0.0,0.0,25.0
