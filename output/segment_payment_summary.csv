@@ -1,0 +1,14 @@
+city,payment_method,delivery_count,average_delivery_time,total_refund
+Bangalore,Cash,2,27.0,0
+Bangalore,UPI,2,22.5,0
+Chennai,Cash,1,52.0,180
+Chennai,UPI,2,27.0,80
+Delhi,Card,2,43.0,230
+Delhi,UPI,7,38.83,400
+Hyderabad,Card,1,35.0,0
+Hyderabad,Cash,1,38.0,0
+Mumbai,Card,4,25.75,220
+Mumbai,Cash,2,48.0,300
+Mumbai,UPI,2,34.5,110
+Pune,Card,2,22.5,0
+Pune,Cash,2,31.5,0
