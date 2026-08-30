@@ -1,0 +1,119 @@
+{
+    "timestamp": "2026-08-30T15:30:59.822575",
+    "source": "data\\raw\\delivery_profiling_dataset.xlsx",
+    "dataset": {
+        "rows_before": 30,
+        "rows_after": 30,
+        "columns_before": 11,
+        "columns_after": 14
+    },
+    "methods": {
+        "zscore": {
+            "threshold": 3,
+            "description": "Values with absolute Z-score greater than 3 are treated as statistical outliers."
+        },
+        "iqr": {
+            "multiplier": 1.5,
+            "description": "Values outside Q1 - 1.5*IQR and Q3 + 1.5*IQR are treated as outliers."
+        }
+    },
+    "columns_analyzed": [
+        "delivery_time_min",
+        "sla_limit_min",
+        "refund_amount"
+    ],
+    "outlier_analysis": {
+        "delivery_time_min": {
+            "zscore": {
+                "threshold": 3,
+                "outlier_count": 1
+            },
+            "iqr": {
+                "multiplier": 1.5,
+                "q1": 26.75,
+                "q3": 42.5,
+                "iqr": 15.75,
+                "lower_bound": 3.125,
+                "upper_bound": 66.125,
+                "outlier_count": 1
+            },
+            "combined_outlier_count": 1,
+            "handling_strategy": "flag",
+            "reason": "Flag unusual delivery values without deleting records because statistical anomalies may represent legitimate operational events."
+        },
+        "sla_limit_min": {
+            "zscore": {
+                "threshold": 3,
+                "outlier_count": 0
+            },
+            "iqr": {
+                "multiplier": 1.5,
+                "q1": 30.0,
+                "q3": 30.0,
+                "iqr": 0.0,
+                "lower_bound": 30.0,
+                "upper_bound": 30.0,
+                "outlier_count": 0
+            },
+            "combined_outlier_count": 0,
+            "handling_strategy": "flag",
+            "reason": "Flag unusual delivery values without deleting records because statistical anomalies may represent legitimate operational events."
+        },
+        "refund_amount": {
+            "zscore": {
+                "threshold": 3,
+                "outlier_count": 0
+            },
+            "iqr": {
+                "multiplier": 1.5,
+                "q1": 0.0,
+                "q3": 107.5,
+                "iqr": 107.5,
+                "lower_bound": -161.25,
+                "upper_bound": 268.75,
+                "outlier_count": 0
+            },
+            "combined_outlier_count": 0,
+            "handling_strategy": "flag",
+            "reason": "Flag unusual delivery values without deleting records because statistical anomalies may represent legitimate operational events."
+        }
+    },
+    "handling_strategy": {
+        "action": "flag",
+        "reason": "Flagging preserves the original records while allowing downstream analysis to identify unusual delivery values."
+    },
+    "summary": {
+        "columns_analyzed": 3,
+        "total_outlier_flags": 1,
+        "rows_removed": 0,
+        "data_preserved": true
+    },
+    "validation": {
+        "delivery_time_min": {
+            "status": "PASS",
+            "flag_column": "delivery_time_min_outlier",
+            "unique_flag_values": [
+                0,
+                1
+            ]
+        },
+        "sla_limit_min": {
+            "status": "PASS",
+            "flag_column": "sla_limit_min_outlier",
+            "unique_flag_values": [
+                0
+            ]
+        },
+        "refund_amount": {
+            "status": "PASS",
+            "flag_column": "refund_amount_outlier",
+            "unique_flag_values": [
+                0
+            ]
+        }
+    },
+    "outputs": {
+        "audit_log": "output\\outlier_cleaning_log.csv",
+        "report": "output\\outlier_detection_report.json"
+    }
+}
