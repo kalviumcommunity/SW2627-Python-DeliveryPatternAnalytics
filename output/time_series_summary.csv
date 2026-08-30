@@ -1,0 +1,8 @@
+metric,value
+total_deliveries,30
+total_refund,1520
+overall_avg_delivery_time,33.785714285714285
+overall_avg_sla_ratio,1.1261904761904762
+maximum_daily_refund,300
+maximum_daily_delivery_count,2
+delivery_time_trend,Uptrend - Average delivery time is increasing
