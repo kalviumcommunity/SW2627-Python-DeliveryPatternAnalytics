@@ -1,0 +1,110 @@
+{
+    "timestamp": "2026-08-30T14:28:19.918300",
+    "source": "data\\raw\\delivery_profiling_dataset.xlsx",
+    "dataset": {
+        "rows": 30,
+        "columns": 18,
+        "column_names": [
+            "delivery_id",
+            "customer_name",
+            "rider_id",
+            "city",
+            "delivery_time_min",
+            "sla_limit_min",
+            "delivery_status",
+            "complaint",
+            "refund_amount",
+            "delivery_date",
+            "payment_method",
+            "day_of_week",
+            "dow_numeric",
+            "hour",
+            "week_num",
+            "month",
+            "quarter",
+            "days_since_delivery"
+        ]
+    },
+    "before_dtypes": {
+        "delivery_id": "int64",
+        "customer_name": "str",
+        "rider_id": "str",
+        "city": "str",
+        "delivery_time_min": "float64",
+        "sla_limit_min": "int64",
+        "delivery_status": "str",
+        "complaint": "str",
+        "refund_amount": "int64",
+        "delivery_date": "str",
+        "payment_method": "str"
+    },
+    "after_dtypes": {
+        "delivery_id": "int64",
+        "customer_name": "str",
+        "rider_id": "str",
+        "city": "str",
+        "delivery_time_min": "float64",
+        "sla_limit_min": "int64",
+        "delivery_status": "str",
+        "complaint": "str",
+        "refund_amount": "int64",
+        "delivery_date": "datetime64[us]",
+        "payment_method": "str",
+        "day_of_week": "str",
+        "dow_numeric": "int32",
+        "hour": "int32",
+        "week_num": "Int64",
+        "month": "int32",
+        "quarter": "int32",
+        "days_since_delivery": "int64"
+    },
+    "dtype_changes": {
+        "delivery_date": {
+            "before": "str",
+            "after": "datetime64[us]"
+        }
+    },
+    "date_features_created": [
+        "day_of_week",
+        "dow_numeric",
+        "hour",
+        "week_num",
+        "month",
+        "quarter",
+        "days_since_delivery"
+    ],
+    "conversion_logs": [
+        {
+            "column": "delivery_date",
+            "conversion": "string/date \u2192 datetime",
+            "format": "%Y-%m-%d",
+            "invalid_values": [],
+            "invalid_count": 0
+        }
+    ],
+    "weekly_summary": [
+        {
+            "delivery_date": "2026-07-05 00:00:00",
+            "delivery_count": 10
+        },
+        {
+            "delivery_date": "2026-07-12 00:00:00",
+            "delivery_count": 14
+        },
+        {
+            "delivery_date": "2026-07-19 00:00:00",
+            "delivery_count": 6
+        }
+    ],
+    "validation": {
+        "delivery_date_is_datetime": true,
+        "invalid_dates": 0,
+        "required_features_present": true,
+        "status": "PASS"
+    },
+    "summary": {
+        "features_created": 7,
+        "dtype_changes": 1,
+        "validation_status": "PASS"
+    }
+}

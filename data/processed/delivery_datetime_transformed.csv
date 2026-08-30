@@ -1,0 +1,31 @@
+delivery_id,customer_name,rider_id,city,delivery_time_min,sla_limit_min,delivery_status,complaint,refund_amount,delivery_date,payment_method,day_of_week,dow_numeric,hour,week_num,month,quarter,days_since_delivery
+1001,Aarav Sharma,R001,Delhi,28.0,30,On Time,No,0,2026-07-01,UPI,Wednesday,2,0,27,7,3,60
+1002,Priya Singh,R002,Mumbai,42.0,30,Delayed,Yes,120,2026-07-01,Card,Wednesday,2,0,27,7,3,60
+1003,Rahul Verma,R003,Bangalore,25.0,30,On Time,No,0,2026-07-02,Cash,Thursday,3,0,27,7,3,59
+1004,Neha Gupta,R004,Delhi,55.0,30,Delayed,Yes,200,2026-07-02,UPI,Thursday,3,0,27,7,3,59
+1005,Aarav Sharma,R005,Delhi,31.0,30,Delayed,No,0,2026-07-03,UPI,Friday,4,0,27,7,3,58
+1006,Riya Patel,R006,Pune,22.0,30,On Time,No,0,2026-07-03,Card,Friday,4,0,27,7,3,58
+1007,Mohit Kumar,R007,Mumbai,48.0,30,Delayed,Yes,150,2026-07-04,Cash,Saturday,5,0,27,7,3,57
+1007,Mohit Kumar,R007,Mumbai,48.0,30,Delayed,Yes,150,2026-07-04,Cash,Saturday,5,0,27,7,3,57
+1009,Sneha Iyer,R008,Chennai,27.0,30,On Time,No,0,2026-07-05,UPI,Sunday,6,0,27,7,3,56
+1010,Vikram Rao,R009,Hyderabad,35.0,30,Delayed,No,0,2026-07-05,Card,Sunday,6,0,27,7,3,56
+1011,Ananya Mehta,R010,Delhi,,30,,No,0,2026-07-06,UPI,Monday,0,0,28,7,3,55
+1012,Karan Joshi,R011,Pune,29.0,30,On Time,,0,2026-07-06,Cash,Monday,0,0,28,7,3,55
+1013,Rohit Das,R012,Mumbai,-15.0,30,On Time,No,0,2026-07-07,Card,Tuesday,1,0,28,7,3,54
+1014,Meera Shah,R013,Delhi,33.0,30,Delayed,Yes,-50,2026-07-07,UPI,Tuesday,1,0,28,7,3,54
+1015,Arjun Nair,R014,Bangalore,24.0,30,On Time,No,0,2026-07-08,UPI,Wednesday,2,0,28,7,3,53
+1016,Priya Singh,R015,Mumbai,44.0,30,Delayed,Yes,100,2026-07-08,Card,Wednesday,2,0,28,7,3,53
+1017,Sneha Iyer,R016,Chennai,,30,Delayed,Yes,80,2026-07-09,UPI,Thursday,3,0,28,7,3,52
+1018,Vikram Rao,R017,Hyderabad,38.0,30,Delayed,No,0,2026-07-09,Cash,Thursday,3,0,28,7,3,52
+1019,Aarav Sharma,R018,Delhi,26.0,30,On Time,No,0,2026-07-10,UPI,Friday,4,0,28,7,3,51
+1020,Ananya Mehta,R019,Delhi,41.0,30,Delayed,Yes,90,2026-07-10,Card,Friday,4,0,28,7,3,51
+1021,Rahul Verma,R020,Bangalore,29.0,30,On Time,No,0,2026-07-11,Cash,Saturday,5,0,28,7,3,50
+1022,Neha Gupta,R021,Delhi,60.0,30,Delayed,Yes,250,2026-07-11,UPI,Saturday,5,0,28,7,3,50
+1023,Riya Patel,R022,Pune,23.0,30,On Time,No,0,2026-07-12,Card,Sunday,6,0,28,7,3,49
+1024,Karan Joshi,R023,Pune,34.0,30,Delayed,No,0,2026-07-12,Cash,Sunday,6,0,28,7,3,49
+1025,Rohit Das,R024,Mumbai,39.0,30,Delayed,Yes,110,2026-07-13,UPI,Monday,0,0,29,7,3,48
+1026,Priya  Singh,R025,Mumbai,32.0,30,Delayed,No,0,2026-07-13,Card,Monday,0,0,29,7,3,48
+1027,PRIYA SINGH,R026,Mumbai,30.0,30,On Time,No,0,2026-07-14,UPI,Tuesday,1,0,29,7,3,47
+1028,Meera Shah,R027,Delhi,45.0,30,Delayed,Yes,140,2026-07-14,Card,Tuesday,1,0,29,7,3,47
+1029,Arjun Nair,R028,Bangalore,21.0,30,On Time,No,0,2026-07-15,UPI,Wednesday,2,0,29,7,3,46
+1030,Sneha Iyer,R029,Chennai,52.0,30,Delayed,Yes,180,2026-07-15,Cash,Wednesday,2,0,29,7,3,46
