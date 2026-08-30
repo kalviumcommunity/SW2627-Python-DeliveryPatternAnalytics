@@ -1,0 +1,31 @@
+delivery_id,customer_name,rider_id,city,delivery_time_min,sla_limit_min,delivery_status,complaint,refund_amount,delivery_date,payment_method,delivery_time_sla_ratio,sla_difference_min,refund_per_delivery_min,delivery_performance,delivery_time_category,delivery_quality_score,delivery_quality_tier
+1001,Aarav Sharma,R001,Delhi,28.0,30,On Time,No,0,2026-07-01,UPI,0.9333333333333333,2.0,0.0,within_sla,short,2,medium
+1002,Priya Singh,R002,Mumbai,42.0,30,Delayed,Yes,120,2026-07-01,Card,1.4,-12.0,2.857142857142857,delayed,medium,0,low
+1003,Rahul Verma,R003,Bangalore,25.0,30,On Time,No,0,2026-07-02,Cash,0.8333333333333334,5.0,0.0,within_sla,short,2,medium
+1004,Neha Gupta,R004,Delhi,55.0,30,Delayed,Yes,200,2026-07-02,UPI,1.8333333333333333,-25.0,3.6363636363636362,delayed,medium,0,low
+1005,Aarav Sharma,R005,Delhi,31.0,30,Delayed,No,0,2026-07-03,UPI,1.0333333333333334,-1.0,0.0,delayed,medium,1,low
+1006,Riya Patel,R006,Pune,22.0,30,On Time,No,0,2026-07-03,Card,0.7333333333333333,8.0,0.0,fast,short,2,medium
+1007,Mohit Kumar,R007,Mumbai,48.0,30,Delayed,Yes,150,2026-07-04,Cash,1.6,-18.0,3.125,delayed,medium,0,low
+1007,Mohit Kumar,R007,Mumbai,48.0,30,Delayed,Yes,150,2026-07-04,Cash,1.6,-18.0,3.125,delayed,medium,0,low
+1009,Sneha Iyer,R008,Chennai,27.0,30,On Time,No,0,2026-07-05,UPI,0.9,3.0,0.0,within_sla,short,2,medium
+1010,Vikram Rao,R009,Hyderabad,35.0,30,Delayed,No,0,2026-07-05,Card,1.1666666666666667,-5.0,0.0,delayed,medium,1,low
+1011,Ananya Mehta,R010,Delhi,,30,,No,0,2026-07-06,UPI,,,,,,1,low
+1012,Karan Joshi,R011,Pune,29.0,30,On Time,,0,2026-07-06,Cash,0.9666666666666667,1.0,0.0,within_sla,short,2,medium
+1013,Rohit Das,R012,Mumbai,-15.0,30,On Time,No,0,2026-07-07,Card,-0.5,45.0,-0.0,fast,short,2,medium
+1014,Meera Shah,R013,Delhi,33.0,30,Delayed,Yes,-50,2026-07-07,UPI,1.1,-3.0,-1.5151515151515151,delayed,medium,0,low
+1015,Arjun Nair,R014,Bangalore,24.0,30,On Time,No,0,2026-07-08,UPI,0.8,6.0,0.0,fast,short,2,medium
+1016,Priya Singh,R015,Mumbai,44.0,30,Delayed,Yes,100,2026-07-08,Card,1.4666666666666666,-14.0,2.272727272727273,delayed,medium,0,low
+1017,Sneha Iyer,R016,Chennai,,30,Delayed,Yes,80,2026-07-09,UPI,,,,,,0,low
+1018,Vikram Rao,R017,Hyderabad,38.0,30,Delayed,No,0,2026-07-09,Cash,1.2666666666666666,-8.0,0.0,delayed,medium,1,low
+1019,Aarav Sharma,R018,Delhi,26.0,30,On Time,No,0,2026-07-10,UPI,0.8666666666666667,4.0,0.0,within_sla,short,2,medium
+1020,Ananya Mehta,R019,Delhi,41.0,30,Delayed,Yes,90,2026-07-10,Card,1.3666666666666667,-11.0,2.1951219512195124,delayed,medium,0,low
+1021,Rahul Verma,R020,Bangalore,29.0,30,On Time,No,0,2026-07-11,Cash,0.9666666666666667,1.0,0.0,within_sla,short,2,medium
+1022,Neha Gupta,R021,Delhi,60.0,30,Delayed,Yes,250,2026-07-11,UPI,2.0,-30.0,4.166666666666667,delayed,medium,0,low
+1023,Riya Patel,R022,Pune,23.0,30,On Time,No,0,2026-07-12,Card,0.7666666666666667,7.0,0.0,fast,short,2,medium
+1024,Karan Joshi,R023,Pune,34.0,30,Delayed,No,0,2026-07-12,Cash,1.1333333333333333,-4.0,0.0,delayed,medium,1,low
+1025,Rohit Das,R024,Mumbai,39.0,30,Delayed,Yes,110,2026-07-13,UPI,1.3,-9.0,2.8205128205128207,delayed,medium,0,low
+1026,Priya  Singh,R025,Mumbai,32.0,30,Delayed,No,0,2026-07-13,Card,1.0666666666666667,-2.0,0.0,delayed,medium,1,low
+1027,PRIYA SINGH,R026,Mumbai,30.0,30,On Time,No,0,2026-07-14,UPI,1.0,0.0,0.0,within_sla,short,2,medium
+1028,Meera Shah,R027,Delhi,45.0,30,Delayed,Yes,140,2026-07-14,Card,1.5,-15.0,3.111111111111111,delayed,medium,0,low
+1029,Arjun Nair,R028,Bangalore,21.0,30,On Time,No,0,2026-07-15,UPI,0.7,9.0,0.0,fast,short,2,medium
+1030,Sneha Iyer,R029,Chennai,52.0,30,Delayed,Yes,180,2026-07-15,Cash,1.7333333333333334,-22.0,3.4615384615384617,delayed,medium,0,low
