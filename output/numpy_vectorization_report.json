@@ -1,0 +1,22 @@
+{
+    "assignment": "LU 2.24 - NumPy Vectorised Computation Workflow",
+    "source": "data\\raw\\delivery_profiling_dataset.xlsx",
+    "target_column": "delivery_time_min",
+    "dataset": {
+        "rows": 30,
+        "columns": 13
+    },
+    "operations": {
+        "min_max_normalization": true,
+        "z_score_normalization": true
+    },
+    "performance": {
+        "loop_time_seconds": 3.45e-05,
+        "numpy_time_seconds": 5.56e-05,
+        "speedup": 0.62
+    },
+    "validation": {
+        "loop_and_numpy_results_match": true
+    },
+    "output": "data\\processed\\delivery_vectorized.csv"
+}
