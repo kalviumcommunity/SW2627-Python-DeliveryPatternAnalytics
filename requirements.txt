@@ -34,3 +34,4 @@ pandas
 numpy
 matplotlib
 streamlit
+plotly
