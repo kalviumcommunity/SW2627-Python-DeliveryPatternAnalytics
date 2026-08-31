@@ -1,97 +1,248 @@
-# Delivery Pattern Analytics Platform
+# Data Type Enforcement & Standardisation
 
-## Project Overview
+## Overview
 
-The **Delivery Pattern Analytics Platform** is a Python-based data analytics project built to process, clean, validate, analyse, and visualise delivery data.
+This assignment implements **Data Type Enforcement & Standardisation (2.19)** for the Delivery Pattern Analytics Platform.
 
-The project takes raw delivery records and converts them into reliable, analysis-ready data while identifying data-quality issues and generating useful business insights around delivery performance, SLA compliance, complaints, refunds, customers, cities, and trends.
+The purpose is to ensure that important columns use correct and consistent data types before analysis.
 
-## What We Used
+The module handles:
 
-- **Python** for the overall data-processing workflow
-- **Pandas** for data loading, cleaning, transformation, aggregation, and analysis
-- **NumPy** for efficient vectorised numerical computations
-- **Matplotlib** for statistical visualisations
-- **OpenPyXL** for Excel dataset processing
-- **Streamlit** for building the interactive frontend/dashboard
-- **CSV, JSON, and Excel** for data handling
-- **Git & GitHub** for version control and project collaboration
+- String to datetime conversion
+- Currency to float conversion
+- Text/integer to Boolean conversion
+- Before/after dtype comparison
+- Conversion validation
+- Conversion error logging
 
-## What We Built
+## Technologies
 
-We built a complete data analytics pipeline that includes:
+- Python 3.13
+- Pandas
+- OpenPyXL
+- JSON
 
-- Dataset validation and source checking
-- CSV/JSON data ingestion
-- Dataset profiling and quality assessment
-- Missing-value handling and imputation
-- Data type enforcement and standardisation
-- Duplicate detection and deduplication
-- String cleaning and text normalisation
-- Date and time transformation
-- Outlier detection
-- Data validation and quality-control rules
-- Feature engineering
-- NumPy-based performance optimisation
-- Distribution and correlation analysis
-- GroupBy and segment-level analysis
-- Time-series analysis
-- Interactive Streamlit dashboard
-- Dynamic dataset upload and preview
-- Session-state based workflow persistence
-
-## Final Application
-
-The processed data and analytical features are brought together in an interactive **Streamlit dashboard**.
-
-The dashboard provides a simple interface for exploring delivery data, viewing metrics, analysing trends and segments, and interacting with uploaded datasets.
-
-The project therefore covers the complete journey from **raw data → data quality → processing → analysis → interactive visualisation**.
-
-## Project Structure
+## Input Dataset
 
 ```text
-SW2627-Python-DeliveryPatternAnalytics/
-│
-├── data/
-│   └── raw/
-│
-├── scripts/
-│   ├── app.py
-│   ├── data_ingestion.py
-│   ├── data_profiling.py
-│   ├── missing_value_handling.py
-│   ├── type_enforcement.py
-│   ├── duplicate_detection.py
-│   ├── string_cleaning.py
-│   ├── datetime_transformation.py
-│   ├── outlier_detection.py
-│   ├── data_validation.py
-│   ├── feature_engineering.py
-│   ├── numpy_vectorization.py
-│   ├── distribution_analysis.py
-│   ├── correlation_analysis.py
-│   └── time_series_analysis.py
-│
-├── output/
-│
-└── README.md
+data/raw/delivery_profiling_dataset.xlsx
+```
 
-Running the Application
+The dataset contains delivery information such as:
+
+- delivery_id
+- customer_name
+- rider_id
+- city
+- delivery_time_min
+- sla_limit_min
+- delivery_status
+- complaint
+- refund_amount
+- delivery_date
+- payment_method
+
+The original Excel file is not modified.
+
+## Type Enforcement
+
+| Column | Conversion | Final Type |
+|---|---|---|
+| delivery_date | String → Datetime | datetime64[ns] |
+| refund_amount | Currency → Float | float64 |
+| complaint | Text/Integer → Boolean | boolean |
+
+### Date Conversion
+
+The `delivery_date` column is converted using an explicit format:
+
+```python
+pd.to_datetime(
+    value,
+    format="%Y-%m-%d"
+)
+```
+
+Using an explicit format prevents incorrect date interpretation.
+
+### Currency Conversion
+
+The `refund_amount` column is cleaned before conversion.
+
+Currency symbols and commas are removed:
+
+```text
+$1,250.00 → 1250.00
+```
+
+The final type is:
+
+```text
+float64
+```
+
+Invalid values are recorded as conversion errors.
+
+### Boolean Conversion
+
+The `complaint` column supports:
+
+```text
+Yes → True
+No  → False
+1   → True
+0   → False
+```
+
+The final Pandas type is:
+
+```text
+boolean
+```
+
+## Validation
+
+The script captures data types before conversion and after conversion.
+
+It validates that:
+
+- delivery_date → datetime64[ns]
+- refund_amount → float64
+- complaint → boolean
+
+Each conversion is reported as PASS or FAIL.
+
+## Script
+
+The implementation is located at:
+
+```text
+scripts/type_enforcement.py
+```
+
+## Workflow
+
+```text
+Load Dataset
+     ↓
+Capture Original Types
+     ↓
+Convert Date
+     ↓
+Convert Currency
+     ↓
+Convert Boolean
+     ↓
+Capture Final Types
+     ↓
+Compare Types
+     ↓
+Validate Conversions
+     ↓
+Generate Report
+     ↓
+Save Processed Dataset
+```
+
+## Output Files
+
+The script generates:
+
+```text
+output/type_enforced_deliveries.csv
+```
+
+This contains the dataset after type conversion.
+
+It also generates:
+
+```text
+output/type_enforcement_report.json
+```
+
+The report records:
+
+- Original data types
+- Final data types
+- Type changes
+- Conversion methods
+- Conversion errors
+- Validation results
+
+## Running the Script
 
 Activate the virtual environment:
 
-venv\Scripts\activate
+```bash
+source venv/Scripts/activate
+```
 
-Install dependencies:
+Check dependencies:
 
-python -m pip install pandas numpy matplotlib openpyxl streamlit
+```bash
+python -c "import pandas; import openpyxl; print('Dependencies OK')"
+```
 
-Run the dashboard:
+Run the script:
 
-python -m streamlit run scripts/app.py
-Conclusion
+```bash
+python scripts/type_enforcement.py
+```
 
-The completed project combines data engineering, data cleaning, statistical analysis, feature engineering, performance optimisation, and frontend development into one end-to-end analytics platform.
+## Expected Result
 
-It provides a strong foundation for understanding delivery patterns and generating reliable business insights from delivery data.
+A successful execution should show:
+
+```text
+delivery_date: PASS
+refund_amount: PASS
+complaint: PASS
+```
+
+The terminal will also display the locations of the generated output files.
+
+## Data Preservation
+
+The original dataset remains unchanged:
+
+```text
+data/raw/delivery_profiling_dataset.xlsx
+```
+
+Only the processed copy is saved to:
+
+```text
+output/type_enforced_deliveries.csv
+```
+
+This keeps the original source data available for auditing and reproducibility.
+
+## Relationship With Previous Assignments
+
+The project workflow now follows:
+
+```text
+Validation
+    ↓
+Ingestion
+    ↓
+Profiling
+    ↓
+Missing Value Handling
+    ↓
+Type Enforcement
+```
+
+The previous assignments identified and handled data-quality problems.
+
+This assignment ensures that the cleaned data uses reliable and predictable data types.
+
+## Assignment Outcome
+
+The completed module provides a reusable type-enforcement stage.
+
+It explicitly converts dates, currency, and Boolean fields, validates the resulting types, records conversion information, and saves both the processed dataset and an audit report.
+
+The resulting dataset is ready for reliable calculations, filtering, aggregation, time-based analysis, and future analytics.
+
+Live Demo: https://sw2627-python-deliverypatternanalytics.onrender.com/
