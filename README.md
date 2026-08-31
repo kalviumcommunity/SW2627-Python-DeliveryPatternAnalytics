@@ -244,3 +244,5 @@ The completed module provides a reusable type-enforcement stage.
 It explicitly converts dates, currency, and Boolean fields, validates the resulting types, records conversion information, and saves both the processed dataset and an audit report.
 
 The resulting dataset is ready for reliable calculations, filtering, aggregation, time-based analysis, and future analytics.
+
+Live Demo: https://sw2627-python-deliverypatternanalytics.onrender.com/
