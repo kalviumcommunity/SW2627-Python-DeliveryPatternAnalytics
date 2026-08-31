@@ -23,15 +23,12 @@ openpyxl==3.1.5
 packaging==26.2
 pandas==3.0.5
 pillow==12.3.0
+plotly
 pyparsing==3.3.2
 python-dateutil==2.9.0.post0
 six==1.17.0
 SQLAlchemy==2.0.51
+streamlit
 typing_extensions==4.16.0
 tzdata==2026.3
 Werkzeug==3.1.8
-pandas
-numpy
-matplotlib
-streamlit
-plotly
